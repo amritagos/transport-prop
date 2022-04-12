@@ -48,3 +48,12 @@ Install the dependencies using the `requirements.txt` file, using `python3 -m pi
 
 To install the module, run the command `pip install -e .` in editable mode. 
 
+## Tests
+
+To run tests (which are inside the `tests` directory), written with `pytest`, run the following command from the top-level directory: 
+
+```bash
+pytest
+```
+
+In order to debug tests using `pdb`, you can write the command `breakpoint()` inside the `Python` files (in `tests`) wherever you want to set a breakpoint. Then, run `pytest --pdb`. This will stop the code at the line where you put the `breakpoint()` command. 
