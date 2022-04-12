@@ -58,6 +58,8 @@ pytest
 
 In order to debug tests using `pdb`, you can write the command `breakpoint()` inside the `Python` files (in `tests`) wherever you want to set a breakpoint. Then, run `pytest --pdb`. This will stop the code at the line where you put the `breakpoint()` command. 
 
+To see more verbose output from `pytest`, including tests that pass, you can run `pytest -rA`. 
+
 ## Validation 
 
 Using the [VMD Diffusion Coefficient Tool](https://github.com/giorginolab/vmd_diffusion_coefficient), the MSD (mean-squared displacement) was calculated for a trajectory of mW water. In a `Jupyter Notebook`, the diffusion coefficient is calculated using linear regression. Please see the `validation` directory for more details. 
