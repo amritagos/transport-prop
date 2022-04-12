@@ -10,3 +10,21 @@ dynamic = ["version", "description"]
 
 [project.urls]
 Home = "https://english.hi.is/staff/amrita"
+
+[project.optional-dependencies]
+test = [
+    "pytest==6.2.5",
+    "coverage==6.1.1",
+    "pytest-cov==3.0.0",
+]
+dev = [
+    "flake8==3.9.2",
+    "mypy==0.910",
+    "black==21.10b0",
+    "isort==5.9.3",
+    "autoflake==1.4",
+    "flake8-docstrings==1.6.0",
+]
+
+[tool.isort]
+profile = "black"
