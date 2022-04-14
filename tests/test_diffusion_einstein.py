@@ -21,6 +21,24 @@ def get_short_single_particle_traj():
     wat_traj = ase.io.read(p, index=':') # Read in every step of the trajectory
     return wat_traj
 
-def test_traj(get_short_single_particle_traj):
+def test_msd_single_iatom_t_t0(get_short_single_particle_traj):
+    ''' Tests the squared distance function between a given time origin and
+    lag time for a single particle 
+    '''
     wat_traj = get_short_single_particle_traj # ASE Atoms list with unwrapped coordinates
-    assert len(wat_traj) == 11
+    # Given a time origin (the first frame, index 0 in wat_traj)
+    # and a lag time of 1 delta_t (difference between time frames)
+    # Calculate the squared distance for a single particle. 
+    pos_t0 = wat_traj[0].get_positions() # Positions of all atoms in the first frame
+    # Although here there is only one atom 
+    pos_t = wat_traj[1].get_positions() # Positions of all atoms in the second frame
+    # Get the position of the atom with index 0 at time origin t0  
+    pos_t0_iatom = pos_t0[0 , :]
+    # Get the positions of the atom with index 0 at time origin t
+    pos_t_iatom = pos_t[0 , :]
+    r2 = trp.sq_disp_iatom(pos_t0_iatom, pos_t_iatom) # Squared distance 
+    # Check: 
+    # should be 1482.2965976770176 A^2
+    r2_ref = 1482.2965976770176
+    assert r2 == pytest.approx(r2_ref, 1e-6)
+
