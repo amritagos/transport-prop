@@ -1,5 +1,5 @@
 # Declare exported functions
-__all__ = [ 'tau_t0', 'my_read_lammps_data']
+__all__ = [ 'tau_t0', 'sq_disp_iatom']
 
 import numpy as np
 from ase.atoms import Atoms # ASE stuff 
@@ -18,6 +18,10 @@ def sq_disp_iatom(pos_t0_iatom, pos_t_iatom):
     pos_t_iatom: Unwrapped coordinates for the atom iatom, which should be
                             of size (dim, ).
     '''
+    dr = pos_t0_iatom - pos_t_iatom # (dim, ) difference in unwrapped coord for iatom
+    r = np.linalg.norm(dr)
+    return r**2 # return MSD_i between t0 and t
+
 
 def tau_t0(pos_t0, pos_t):
     ''' This calculates the mean-squared displacement (MSD), given a particular time origin,
