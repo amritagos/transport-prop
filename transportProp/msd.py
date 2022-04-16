@@ -1,5 +1,5 @@
 # Declare exported functions
-__all__ = [ 'tau_t0', 'sq_disp_iatom']
+__all__ = [ 'tau_t0', 'sq_disp_iatom', 'tau_t0']
 
 import numpy as np
 from ase.atoms import Atoms # ASE stuff 
@@ -27,12 +27,22 @@ def tau_t0(pos_t0, pos_t):
     ''' This calculates the mean-squared displacement (MSD), given a particular time origin,
     and a particular lag time, averaged over all the particles in the system (say, n_atoms). 
     This returns the squared displacement, in the same units as the coordinates in
-    the input ASE Atoms objects.
+    the input data.
 
     pos_t0: NumPy array of positions of n_atoms at a particular time origin;
                     should have a shape of (n_atoms, dim), where dim is the number of dimensions
                     for which the MSD is being calculated.
-    pos_t : ASE Atoms object at time=t0+tau (where tau is a particular time lag);
+    pos_t : NumPy array of positions of n_atoms at time=t0+tau (where tau is a particular lag time);
                     should also have a shape of (n_atoms, dim)
     '''
     n_atoms = np.shape(pos_t0)[0] # Number of total atoms 
+    r2 = np.zeros(n_atoms) # Will contain the squared distance values for every atom  
+    
+    # Loop over all the atoms
+    # to get the squared displacement given positions
+    # at t0 and t
+    for i in range(n_atoms):
+        r2[i] = sq_disp_iatom( pos_t0[i,:], pos_t[i,:] )
+
+    # Get the average over all atoms
+    return np.mean(r2, dtype=np.float64)
