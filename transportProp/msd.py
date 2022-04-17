@@ -51,7 +51,7 @@ class MeanSquaredDisplacement():
         r = np.linalg.norm(dr)
         return r**2 # return MSD_i between t0 and t
 
-    def tau_t0(self, pos_t0, pos_t):
+    def msd_tau_t0(self, pos_t0, pos_t):
         ''' This calculates the mean-squared displacement (MSD), given a particular time origin,
         and a particular lag time, averaged over all the particles in the system (say, n_atoms). 
         This returns the squared displacement, in the same units as the coordinates in
