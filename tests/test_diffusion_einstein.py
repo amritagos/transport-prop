@@ -72,7 +72,7 @@ def test_msd_all_atoms_t_t0(short_three_particle):
     # and a lag time of 1 delta_t (difference between time frames)
     pos_t0 = wat_traj[0].get_positions() # Positions of all atoms in the first frame
     pos_t = wat_traj[1].get_positions() # Positions of all atoms in the second frame
-    msd_t0_t = short_three_particle.tau_t0(pos_t0, pos_t) # MSD for one t0 and lag time, averaged over particles 
+    msd_t0_t = short_three_particle.msd_tau_t0(pos_t0, pos_t) # MSD for one t0 and lag time, averaged over particles 
     # Check: 
     # should be 3109.92125715317 A^2
     msd_tt0_ref = 3109.92125715317
