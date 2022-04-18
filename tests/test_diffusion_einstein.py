@@ -77,3 +77,9 @@ def test_msd_all_atoms_t_t0(short_three_particle):
     # should be 3109.92125715317 A^2
     msd_tt0_ref = 3109.92125715317
     assert msd_t0_t == pytest.approx(msd_tt0_ref, 1e-6)
+
+# def  test_msd_3_particles(short_three_particle):
+#     '''MSD for a three particle system, 11 steps'''
+#     msd = short_three_particle.calculate_msd()
+#     breakpoint()
+#     assert msd == 1
