@@ -1,0 +1,30 @@
+# Options for calculating the MSD
+# Comment out if you want to use default values
+# Please note that the trajectory file path must be given (no default available) 
+[msd]
+trajectory = 'MWwater-260'
+
+# File format type according to ASE
+# If the trajectory_file_type is not specified by the user,
+# i.e., if the following line is commented out, then the file format  
+# will be inferred from the name of the file using the ASE io read in function.  
+trajectory_file_type = 'lammps-dump-text'
+
+# The maximum lag time that will be calculated. 
+# By default, this is int(0.5* total number of steps)
+# max_lag_time =
+
+# A first time origin of 0 corresponds to the first configuration
+# in the trajectory file 
+first_time_origin = 0
+
+# The first lag time to calculate 
+first_lag_time = 1
+
+# Step size in the lag times. By default it is 1. 
+# Comment out to use the default value 
+step_size_lag_time = 10
+
+# This decides whether to calculate the MSD in the x, y, z or all dimensions
+# The allowed values are: 'x', 'y', 'z', 'xyz' or 'all'
+dimension = 'all'
