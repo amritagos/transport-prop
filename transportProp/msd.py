@@ -136,6 +136,10 @@ class MeanSquaredDisplacement():
         ''' Given a valid trajectory, calculate the MSD for various lag times. 
         The first lag time is given by start_tau, and subsequent values of the lag time
         are incremented in steps of delta_tau, up till the maximum lag time max_tau is reached. 
+
+        The output numPy array will be of size (n_tau, 2), where n_tau corresponds to the number of lag times 
+        calculated. The first column contains the lag times, and the second column contains the corresponding MSD
+        values. 
         '''
         # where we store the lag time and the associated MSD averaged over the time origins and atoms
         msdList = [] # will be reshaped later 
