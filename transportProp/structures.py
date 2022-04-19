@@ -11,4 +11,4 @@ class MSDparams:
     first_time_origin: int = 0
     first_lag_time: int = 1
     step_size_lag_time: int = 1  
-    dimension: str = 'xyz'
+    dimension: str = 'all'
