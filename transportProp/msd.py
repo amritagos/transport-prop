@@ -95,8 +95,12 @@ class MeanSquaredDisplacement():
         # Loop over all the atoms
         # to get the squared displacement given positions
         # at t0 and t
-        for i in range(self.n_atoms):
-            r2[i] = self.sq_disp_iatom( pos_t0[i,:], pos_t[i,:] )
+        if self.dim=='xyz':
+            for i in range(self.n_atoms):
+                r2[i] = self.sq_disp_iatom( pos_t0[i,:], pos_t[i,:] )
+        else:
+            for i in range(self.n_atoms):
+                r2[i] = self.sq_disp_iatom( pos_t0[i], pos_t[i] )
 
         # Get the average over all atoms
         return np.mean(r2, dtype=np.float64)
