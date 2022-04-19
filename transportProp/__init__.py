@@ -6,3 +6,4 @@ from .io import *
 from .msd import *
 from .misc import * 
 from .structures import * 
+from .cli import * 
