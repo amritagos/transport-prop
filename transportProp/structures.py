@@ -12,3 +12,4 @@ class MSDparams:
     first_lag_time: int = 1
     step_size_lag_time: int = 1  
     dimension: str = 'all'
+    use_center_of_mass: bool = False 
