@@ -2,13 +2,17 @@
 # Comment out if you want to use default values
 # Please note that the trajectory file path must be given (no default available) 
 [msd]
-trajectory = 'MWwater-260'
+trajectory = 'dump/traj_unwrapped.lammpstrj'
 
 # File format type according to ASE
 # If the trajectory_file_type is not specified by the user,
 # i.e., if the following line is commented out, then the file format  
 # will be inferred from the name of the file using the ASE io read in function.  
 trajectory_file_type = 'lammps-dump-text'
+
+# Use the center of mass of every molecule
+# By default, this is false. Currently this is hard-coded for water 
+use_center_of_mass = true
 
 # The maximum lag time that will be calculated. 
 # By default, this is int(0.5* total number of steps)
