@@ -104,3 +104,29 @@ class VelocityAutoCorrelation():
 
         # Get the average over all the permitted time origins
         return np.mean(vacf_origins, dtype=np.float64, axis=0)
+
+    def calculate_vacf(self):
+        ''' Given a valid trajectory with velocities, calculate the VACF for various lag times. 
+        The first lag time is given by start_tau, and subsequent values of the lag time
+        are incremented in steps of delta_tau, up till the maximum lag time max_tau is reached. 
+
+        The output numPy array will be of size (n_tau, 4), where n_tau corresponds to the number of lag times 
+        calculated. The first column contains the lag times, with the other columns containing the VACF of vx*vx, vy*vy
+        and vz*vz respectively.
+        '''
+        # where we store the lag time and the associated VACF averaged over the time origins and atoms
+        vacfList = [] # will be reshaped later 
+        n_tau = 0 # Number of lag times 
+
+        # Loop over the lag times 
+        for i_tau in range(self.start_tau, self.max_tau, self.delta_tau):
+            n_tau += 1 
+            current_tau = i_tau # Current lag time 
+            # Get the MSD for this lag time over the desired time origins 
+            current_vacf = self.vacf_tau(current_tau)
+            # Update the list of MSD values (1-D for now)
+            vacfList.append(current_tau)
+            vacfList.append(current_msd)
+
+        # Get a numPy array of the lag times and the VACF values
+        return np.array(vacfList).reshape( (n_tau, 4) )
