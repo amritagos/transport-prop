@@ -9,6 +9,7 @@ from ase.io import read, write, lammpsrun
 
 from . import structures 
 from . import msd 
+from . import misc 
 
 def get_msd_data_options(toml_filename):
     ''' Read in the options for performing a mean-squared displacement calculation.
@@ -50,6 +51,12 @@ def perform_msd_calc(msd_options):
     out_dir = 'output'
     path = pathlib.Path(out_dir) # TODO: time stamp?
     path.mkdir(parents=True, exist_ok=True) 
+
+    # Get the center of masses 
+    # TODO: make this more general
+    # Hard-coded for water 
+    if msd_options.use_center_of_mass:
+        atoms_traj = misc.com_water_traj(atoms_traj)
 
     # For all files to be written out: 
     if msd_options.dimension == 'all':
