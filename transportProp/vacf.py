@@ -60,7 +60,7 @@ class VelocityAutoCorrelation():
         ''' This calculates the product of velocities:
         v0 (at a particular time origin) and v_t (at a particular lag time), 
         averaged over all the particles in the system (say, n_atoms). 
-        This returns the a velocity numPy array of size (dim, ), where dim is the number of dimensions
+        This returns the a numPy array of size (dim, ), where dim is the number of dimensions
         i.e. 3 for a 3 D simulation.
 
         vel_t0: NumPy array of velocities of n_atoms at a particular time origin;
@@ -69,8 +69,38 @@ class VelocityAutoCorrelation():
         vel_t : NumPy array of velocities of n_atoms at time=t0+tau (where tau is a particular lag time);
                         should also have a shape of (n_atoms, dim)
         '''
-
         v_v0 = vel_t0 * vel_t
 
         # Get a single velocity vector vacf_vx, vacf_vy and vacf_vz
         return np.mean(v_v0, dtype=np.float64, axis=0)
+
+
+    def vacf_tau(self, tau):
+        ''' This calculates the VACF (for vx*vx, vy*vy, vz*vz), for a particular lag time tau, 
+        averaged over all permitted time origins [ also averaged over all the particles in the system (say, n_atoms)]. 
+        At this point, we already know the first time origin from which  
+        which the VACF values will be calculated from (start_t0), and we know the number of time origins (n_origins)
+        This returns the averaged squared velocity for vx*vx, vy*vy and vz*vz, in the same units as the velocities in
+        the input data.
+
+        tau: The lag time 
+
+        Returns a numPy array of size (3,) for 3 dimensions, corresponding to vx*vx, vy*vy , vz*vz
+        '''
+        # VACF values of length n_origins for every time origin  
+        vacf_origins = np.zeros((self.n_origins, 3)) 
+
+        # Loop over all the time origins, starting from 
+        # t0 = start_t0
+        for idx in range(self.n_origins):
+            t0 = idx + self.start_t0 # current time origin
+            t = t0 + tau # time t = t0 + lag time 
+            # Velocities at t0 and t
+            vel_t0 = self.traj[t0].get_velocities() # vx, vy, vz velocities 
+            vel_t = self.traj[t].get_velocities() # vx, vy, vz velocities
+
+            # Call the VACF function for t0 and tau
+            vacf_origins[idx, :] = self.v_tau_v_t0(vel_t0, vel_t)
+
+        # Get the average over all the permitted time origins
+        return np.mean(vacf_origins, dtype=np.float64, axis=0)
