@@ -51,3 +51,64 @@ def com_water_traj(atoms_traj):
 
     # Return the list of the Atoms objects with COM 
     return new_traj
+
+def v_com_molecule(masses, v_atoms):
+    '''
+    Calculates the velocity of the center of mass of a molecule.
+
+    masses: list of float; Atomic masses in atomic units. This must be in the same order as the velocity array
+    
+    v_atoms: numPy array of size (n_atoms, dim) where n_atoms is the number of atoms in the molecule
+    and dim is the number of dimensions 
+
+    Returns the a numPy array with velocity of the center of mass of a molecule, of size dim. 
+    '''
+    n_atoms = np.shape(v_atoms)[0]
+    dim = np.shape(v_atoms)[1]
+    vel_mol = np.zeros(dim)
+    
+    for iatom in range(n_atoms):
+        vel_mol[:] += masses[iatom]*v_atoms[iatom, :] 
+    
+    return vel_mol/np.sum(masses)
+
+
+def velocity_com_water_traj(atoms_traj):
+    ''' Given a list of ASE Atoms objects, (read in from a trajectory)
+    and assuming that it is for water and is in the order O H H , 
+    get the velocity of the center of mass of each molecule, and return a new list of Atoms.
+
+    We assume that there are no other atom types in the trajectory, and that the water
+    molecules are perfectly ordered. 
+
+    NOTE: The positions are not the COM of the molecules and are the positions of the O atoms only.
+    This was done since the COM function does not take the minimum image convention into account.
+
+    Additionally, the velocities are set in a rather circuitous way. This is because ASE Atoms objects store 
+    momenta, not the velocities directly. When reading in LAMMPS trajectories, the symbols (and consequently the atomic masses)
+    may not be correct. Therefore, it is important to obtain / set the velocities using the get_velocities() and set_velocities()
+    functions, respectively. 
+
+    TODO: Figure out a way to make this more general!! 
+    '''
+    n_atoms = len(atoms_traj[0])
+    wat = molecule('H2O')
+    wat_masses = wat.get_masses()
+    new_traj = []
+    v_frame = [] # velocities of molecules in one frame at a particular time 
+
+    for atoms in atoms_traj:
+        Oatoms = atoms[::3] 
+        vel_atoms = atoms.get_velocities()
+        for i in range(0, n_atoms, 3):
+            v_com = v_com_molecule(wat_masses, vel_atoms[i:i+3,:])
+            v_frame.append(v_com)
+        # Handle the velocities
+        v_frame = np.array(v_frame)
+        v_frame = np.reshape(v_frame, (len(Oatoms),3))
+        Oatoms.set_velocities(v_frame)
+        new_traj.append(Oatoms)
+        v_frame = []
+
+    # Return the list of the Atoms objects with the velocities 
+    return new_traj
