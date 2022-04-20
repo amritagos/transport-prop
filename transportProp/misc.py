@@ -4,6 +4,7 @@ __all__ = [ 'getpath', 'get_slice', 'com_water_traj']
 from pathlib import Path
 from ase.build import molecule
 from ase import Atoms, Atom
+import numpy as np
 
 def getpath(*a):
     ''' Get the directory in which the current file lives 
