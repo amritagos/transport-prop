@@ -2,7 +2,7 @@
 # Comment out if you want to use default values
 # Please note that the trajectory file path must be given (no default available) 
 [vacf]
-trajectory = 'dump/tip4p2005_velocities.lammpstrj'
+trajectory = 'dump/vel.lammpstrj'
 
 # File format type according to ASE
 # If the trajectory_file_type is not specified by the user,
@@ -27,4 +27,4 @@ first_lag_time = 1
 
 # Step size in the lag times. By default it is 1. 
 # Comment out to use the default value 
-step_size_lag_time = 5
+step_size_lag_time = 1

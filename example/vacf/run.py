@@ -8,9 +8,9 @@ from ase.io import read, write, lammpsrun
 from transportProp import structures, cli 
 
 # # Read in the TOML file 
-msd_options = cli.get_msd_data_options('input.toml')
+vacf_options = cli.get_vacf_data_options('input.toml')
 
-# # Calculate the MSD and 
+# # Calculate the VACF and 
 ## write out the output files
 
-cli.perform_msd_calc(msd_options)
+cli.perform_vacf_calc(vacf_options)

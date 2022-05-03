@@ -124,9 +124,12 @@ class VelocityAutoCorrelation():
             current_tau = i_tau # Current lag time 
             # Get the MSD for this lag time over the desired time origins 
             current_vacf = self.vacf_tau(current_tau)
-            # Update the list of MSD values (1-D for now)
+            # print("current tau: ", i_tau)
+            # print("current vacf: ", current_vacf)
+            # Update the list of VACF values (1-D for now)
             vacfList.append(current_tau)
-            vacfList.append(current_msd)
+            for k in range(3):
+                vacfList.append(current_vacf[k])
 
         # Get a numPy array of the lag times and the VACF values
         return np.array(vacfList).reshape( (n_tau, 4) )
