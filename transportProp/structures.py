@@ -35,3 +35,19 @@ class VACFparams:
     first_lag_time: int = 1
     step_size_lag_time: int = 1  
     velocity_center_of_mass: bool = False 
+
+@dataclass
+class TCFparams:
+    ''' Parameters required for a solvation TCF calculation. 
+    Per-atom energy differences, calculated from two trajectory files
+    would be needed. 
+    These options can be read in from a TOML file. 
+    '''
+    trajectory0: str
+    trajectory1: str
+    trajectory_file_type: str = None
+    energy_key_string: str 
+    max_lag_time: int = None 
+    first_time_origin: int = 0
+    first_lag_time: int = 1
+    step_size_lag_time: int = 1  
