@@ -1,5 +1,5 @@
 # Declare exported functions
-__all__ = [ 'MSDparams', 'VACFparams']
+__all__ = [ 'MSDparams', 'VACFparams', 'TCFparams']
 
 from dataclasses import dataclass, field
 
