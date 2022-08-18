@@ -7,26 +7,24 @@ import os
 import io 
 import re
 import math
+import numpy as np
 
 from . import misc
 
 class TimeCorrelation():
-    ''' A class that takes in two lists of Atoms objects, such that each Atom corresponds to a
-    particular configuration in time. The per atom potential energies in the trajectory must be set previously. 
+    ''' A class that takes in a numPy array of potential energy per atom differences (n_atoms, n_frames), 
+    such that each column corresponds to a particular configuration in time. 
     By default, the number of lag times is taken to be half of the 
     steps in the trajectory, thus ensuring that every TCF calculation averages over the same number of 
     time origins. 
 
-    traj: This must be a list of Atoms objects. Per atom energies must be present. 
+    energy_diff_array: This is a numPy array with the energy differences for each atom (n_atoms, n_frames)
     The coordinates are irrelevant from the point of view of the TCF.
-    The number of frames (n_frames) is obtained from the trajectory. 
+    The number of frames (n_frames) is obtained from the number of columns (counting from start_t0). 
 
     max_tau: The maximum value of the lag time (tau). The TCF values will be averaged over different time origins, upto the max_tau.
     By default, the maximum lag time is taken to be int(0.5*n_frames). This ensures that every TCF for a particular lag time (tau) is 
     averaged over an equal number of times [equal to int(0.5*n_frames)]. TODO: allow averaging over a variable number of time origins? 
-
-    start_t0: Indicates the first time origin from which the TCF values will be calculated. By default, this is 0, which 
-    means that the first time origin will correspond to the first configuration in the trajectory
 
     start_tau: The first lag time to calculate; subsequent lag times are calculated to be start_tau + i * delta_tau, where i = 1, 2... 
     and delta_tau is the step size of the lag time. 
@@ -34,11 +32,9 @@ class TimeCorrelation():
     delta_tau: The step size of the lag times. By default, this is 1. For a delta_tau of 1, the lag times will be 1, 2, 3, ..., max_tau
 
     '''
-    def __init__(self, traj0, traj1, max_tau = None, start_t0 = 0, start_tau = 1, delta_tau = 1):
-        self.traj0 = traj0 # Trajectory, list of Atoms objects ("Ground state")
-        self.traj1 = traj1 # Trajectory, list of Atoms objects (so-called "excited state")
-        self.n_frames = len(traj) # Number of frames in the trajectory
-        self.start_t0 = start_t0 # The first time origin to calculate the MSD values from
+    def __init__(self, energy_diff_array, max_tau = None, start_tau = 1, delta_tau = 1):
+        self.n_frames = energy_diff_array.shape[1] # Number of columns in the energy difference array (counting from start_t0)
+        self.start_t0 = 0 # The first time origin: this is 0 since the array was only started from start_t0
         self.start_tau = start_tau # The first lag time 
         self.delta_tau = delta_tau # Step size in the lag times tau.  
 
@@ -56,7 +52,14 @@ class TimeCorrelation():
         # Here, the number of time origins is equal to the maximum lag time - starting time origin index (default 0)
         self.n_origins = self.max_tau - self.start_t0
         # Assuming that the number of atoms remains constant and is the same in both trajectories
-        self.n_atoms = len(self.traj0[0]) # Number of atoms 
+        self.n_atoms = len(energy_diff_array.shape[0]) # Number of atoms = number of rows in energy difference array  
+
+        # Mean potential energy per atom 
+        mean_energy_single_col = np.mean(energy_diff_array, axis=1)
+        # Broadcast into a repeated array to match the shape of energy_diff_array
+        mean_energy = np.transpose([mean_energy_single_col] * 3)
+        # Array of energy fluctuations ( input for C(t) )
+        self.energ_fluc = energy_diff_array - mean_energy
 
     def e_tau_e_t0(self, f_energ_t0, f_energ_t):
         ''' This calculates the product of the fluctuations in the energy:
