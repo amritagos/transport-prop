@@ -45,8 +45,8 @@ class TCFparams:
     '''
     trajectory0: str
     trajectory1: str
-    trajectory_file_type: str = None
     energy_key_string: str 
+    trajectory_file_type: str = None
     max_lag_time: int = None 
     first_time_origin: int = 0
     first_lag_time: int = 1
