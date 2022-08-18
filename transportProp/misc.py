@@ -1,5 +1,5 @@
 # Declare exported functions
-__all__ = [ 'getpath', 'get_slice', 'com_water_traj']
+__all__ = [ 'getpath', 'get_slice', 'com_water_traj', 'v_com_molecule', 'velocity_com_water_traj']
 
 from pathlib import Path
 from ase.build import molecule
@@ -113,3 +113,28 @@ def velocity_com_water_traj(atoms_traj):
 
     # Return the list of the Atoms objects with the velocities 
     return new_traj
+
+def get_energy_difference(atoms_traj0, atoms_traj1, key_value, start_t0):
+    ''' Given a list of ASE Atoms objects, (read in from two trajectories)
+    and assuming the order of atoms is the same in each, corresponding to the same configuration,
+    process the potential energies per atom and return a numPy array of differences in the potential
+    energy per atom (every column corresponds to a particular time step).  
+
+    We will skip all time steps before the first time origin. 
+    key_value refers to the heading of the column for the per atom potential energies
+    in the LAMMPS trajectory files. 
+
+    TODO: Figure out a way to make this more general!! 
+    '''
+    n_atoms = len(atoms_traj0[0]) # assume constant
+    total_steps = len(atoms_traj0) # total number of configurations in the trajectories
+    energy0 = atoms_traj0[start_t0].arrays[key_value].ravel() # PE per atom in traj0 (n_atoms, 1)
+    energy1 = atoms_traj1[start_t0].arrays[key_value].ravel() # PE per atom in traj1 (n_atoms, 1)
+
+    for istep in range(start_t0+1, total_steps):
+        # Add columns corresponding to each configuration at every time step 
+        energy0 = np.column_stack([energy0, atoms_traj0[istep].arrays[key_value].ravel()])
+        energy1 = np.column_stack([energy1, atoms_traj1[istep].arrays[key_value].ravel()])
+
+    # Return the numPy array 
+    return energy0-energy1
