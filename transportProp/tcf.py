@@ -1,5 +1,5 @@
 # Declare exported functions
-__all__ = [ 'TimeCorrelation']
+__all__ = [ 'SolvationTimeCorrelation']
 
 import numpy as np
 from ase.atoms import Atoms # ASE stuff 
@@ -11,7 +11,7 @@ import numpy as np
 
 from . import misc
 
-class TimeCorrelation():
+class SolvationTimeCorrelation():
     ''' A class that takes in a numPy array of potential energy per atom differences (n_atoms, n_frames), 
     such that each column corresponds to a particular configuration in time. 
     By default, the number of lag times is taken to be half of the 
@@ -52,12 +52,12 @@ class TimeCorrelation():
         # Here, the number of time origins is equal to the maximum lag time - starting time origin index (default 0)
         self.n_origins = self.max_tau - self.start_t0
         # Assuming that the number of atoms remains constant and is the same in both trajectories
-        self.n_atoms = len(energy_diff_array.shape[0]) # Number of atoms = number of rows in energy difference array  
+        self.n_atoms = energy_diff_array.shape[0] # Number of atoms = number of rows in energy difference array  
 
         # Mean potential energy per atom 
         mean_energy_single_col = np.mean(energy_diff_array, axis=1)
         # Broadcast into a repeated array to match the shape of energy_diff_array
-        mean_energy = np.transpose([mean_energy_single_col] * 3)
+        mean_energy = np.transpose([mean_energy_single_col] * self.n_frames)
         # Array of energy fluctuations ( input for C(t) )
         self.energ_fluc = energy_diff_array - mean_energy
 
@@ -66,8 +66,7 @@ class TimeCorrelation():
         f_energ_t0 (fluctuation in the energy at a particular time origin)
         and f_energ_t (at a particular lag time), 
         averaged over all the particles in the system (say, n_atoms). 
-        This returns the a numPy array of size (dim, ), where dim is the number of dimensions
-        i.e. 3 for a 3 D simulation.
+        This returns the a single value.
 
         f_energ_t0: NumPy array of fluctuations in the energy of n_atoms at a particular time origin;
                         should have a shape of (n_atoms, dim), where dim is the number of dimensions
@@ -79,7 +78,7 @@ class TimeCorrelation():
         e_e0 = f_energ_t0 * f_energ_t
 
         # Get a single value (the numerator in the C(t) equation)
-        return np.mean(e_e0, dtype=np.float64, axis=0)
+        return np.mean(e_e0, dtype=np.float64)
 
 
     def tcf_tau(self, tau):
@@ -92,51 +91,46 @@ class TimeCorrelation():
 
         tau: The lag time 
 
-        Returns a numPy array of size (1,)
+        Returns a single value 
         '''
-        # VACF values of length n_origins for every time origin  
-        vacf_origins = np.zeros((self.n_origins, 3)) 
+        # TCF values of length n_origins for every time origin  
+        tcf_origins = np.zeros(self.n_origins) 
 
         # Loop over all the time origins, starting from 
         # t0 = start_t0
         for idx in range(self.n_origins):
             t0 = idx + self.start_t0 # current time origin
             t = t0 + tau # time t = t0 + lag time 
-            # Velocities at t0 and t
-            vel_t0 = self.traj[t0].get_velocities() # vx, vy, vz velocities 
-            vel_t = self.traj[t].get_velocities() # vx, vy, vz velocities
 
-            # Call the VACF function for t0 and tau
-            vacf_origins[idx, :] = self.v_tau_v_t0(vel_t0, vel_t)
+            # Call the TCF function for t0 and tau
+            tcf_origins[idx] = self.e_tau_e_t0(self.energ_fluc[:, t0], self.energ_fluc[:, t])
 
         # Get the average over all the permitted time origins
-        return np.mean(vacf_origins, dtype=np.float64, axis=0)
+        return np.mean(tcf_origins, dtype=np.float64)
 
-    def calculate_vacf(self):
-        ''' Given a valid trajectory with velocities, calculate the VACF for various lag times. 
+    def calculate_tcf(self):
+        ''' Given a valid trajectory with velocities, calculate the TCF for various lag times. 
         The first lag time is given by start_tau, and subsequent values of the lag time
         are incremented in steps of delta_tau, up till the maximum lag time max_tau is reached. 
 
-        The output numPy array will be of size (n_tau, 4), where n_tau corresponds to the number of lag times 
-        calculated. The first column contains the lag times, with the other columns containing the VACF of vx*vx, vy*vy
-        and vz*vz respectively.
+        The output numPy array will be of size (n_tau, 2), where n_tau corresponds to the number of lag times 
+        calculated. The first column contains the lag times, with the other columns containing the TCF.
         '''
-        # where we store the lag time and the associated VACF averaged over the time origins and atoms
-        vacfList = [] # will be reshaped later 
+        # where we store the lag time and the associated TCF averaged over the time origins and atoms
+        tcfList = [] # will be reshaped later 
         n_tau = 0 # Number of lag times 
 
         # Loop over the lag times 
         for i_tau in range(self.start_tau, self.max_tau, self.delta_tau):
             n_tau += 1 
             current_tau = i_tau # Current lag time 
-            # Get the MSD for this lag time over the desired time origins 
-            current_vacf = self.vacf_tau(current_tau)
+            # Get the TCF for this lag time over the desired time origins 
+            current_tcf = self.tcf_tau(current_tau)
             # print("current tau: ", i_tau)
             # print("current vacf: ", current_vacf)
             # Update the list of VACF values (1-D for now)
-            vacfList.append(current_tau)
-            for k in range(3):
-                vacfList.append(current_vacf[k])
+            tcfList.append(current_tau)
+            tcfList.append(current_tcf)
 
         # Get a numPy array of the lag times and the VACF values
-        return np.array(vacfList).reshape( (n_tau, 4) )
+        return np.array(tcfList).reshape( (n_tau, 2) )
