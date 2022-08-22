@@ -8,9 +8,7 @@ from ase.io import read, write, lammpsrun
 from transportProp import structures, cli 
 
 # # Read in the TOML file 
-vacf_options = cli.get_vacf_data_options('input.toml')
+tcf_options = cli.get_tcf_data_options('input.toml')
 
-# # Calculate the VACF and 
-## write out the output files
-
-cli.perform_vacf_calc(vacf_options)
+# Do the calculation 
+cli.perform_tcf_calc(tcf_options)
