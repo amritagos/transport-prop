@@ -12,6 +12,7 @@ from . import structures
 from . import msd 
 from . import vacf
 from . import misc 
+from . import tcf
 
 def get_msd_data_options(toml_filename):
     ''' Read in the options for performing a mean-squared displacement calculation.
@@ -218,15 +219,14 @@ def perform_tcf_calc(tcf_options):
     #  
     # However, the fluctuation in the difference in energy is what will be processed. Get the energy
     # difference as a numPy array, with size (natoms, timesteps); timesteps start from start_t0  
-    atoms_traj = misc.get_energy_difference(atoms_traj0, atoms_traj1, 
+    energy_diff_array = misc.get_energy_difference(atoms_traj0, atoms_traj1, 
         key_value=tcf_options.energy_key_string, start_t0=tcf_options.first_time_origin)
 
-    ## the dimension provided by the user 
-    vacf_obj = vacf.VelocityAutoCorrelation(atoms_traj, max_tau = vacf_options.max_lag_time, 
-        start_t0 = vacf_options.first_time_origin, start_tau = vacf_options.first_lag_time, 
-        delta_tau = vacf_options.step_size_lag_time)
-    # Calculate the VACF
-    vacfList = vacf_obj.calculate_vacf()
+    ## Solvation TCF calculation, given the potential energy difference array  
+    tcf_obj = tcf.SolvationTimeCorrelation(energy_diff_array, max_tau = tcf_options.max_lag_time, 
+        start_tau = tcf_options.first_lag_time, delta_tau = tcf_options.step_size_lag_time)
+    # Calculate the TCF
+    tcfList = tcf_obj.calculate_tcf()
 
     # Write out to file
-    np.savetxt(out_dir+'/vacf'+'.txt', vacfList, delimiter=' ', header = 'tau vacf_xx vacf_yy vacf_zz') 
+    np.savetxt(out_dir+'/tcf'+'.txt', tcfList, delimiter=' ', header = 'tau     solv_tcf') 
