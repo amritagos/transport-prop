@@ -34,3 +34,9 @@ first_lag_time = 1
 # Step size in the lag times. By default it is 1. 
 # Comment out to use the default value 
 step_size_lag_time = 1
+
+# Number of blocks to use to calculate the block average 
+# for the average energy, which will be used to calculate
+# energy difference fluctuations 
+# Comment this out to use the default value of 1 
+num_blocks_for_block_avg = 10
