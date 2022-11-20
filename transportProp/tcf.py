@@ -32,11 +32,12 @@ class SolvationTimeCorrelation():
     delta_tau: The step size of the lag times. By default, this is 1. For a delta_tau of 1, the lag times will be 1, 2, 3, ..., max_tau
 
     '''
-    def __init__(self, energy_diff_array, max_tau = None, start_tau = 1, delta_tau = 1):
+    def __init__(self, energy_diff_array, max_tau = None, start_tau = 1, delta_tau = 1, block_size = 1):
         self.n_frames = energy_diff_array.shape[1] # Number of columns in the energy difference array (counting from start_t0)
         self.start_t0 = 0 # The first time origin: this is 0 since the array was only started from start_t0
         self.start_tau = start_tau # The first lag time 
-        self.delta_tau = delta_tau # Step size in the lag times tau.  
+        self.delta_tau = delta_tau # Step size in the lag times tau. 
+        self.block_size = block_size # Block size in calculating the mean energy array 
 
         # TODO: error handling for start_t0 and delta_tau
 
@@ -54,8 +55,12 @@ class SolvationTimeCorrelation():
         # Assuming that the number of atoms remains constant and is the same in both trajectories
         self.n_atoms = energy_diff_array.shape[0] # Number of atoms = number of rows in energy difference array  
 
-        # Mean potential energy per atom 
-        mean_energy_single_col = np.mean(energy_diff_array, axis=1)
+        # Mean potential energy per atom
+        if block_size<=1:
+             mean_energy_single_col = np.mean(energy_diff_array, axis=1)
+        else:
+            mean_energy_single_col = np.mean(arr[:(len(arr)//block_size)*block_size].reshape(-1,block_size), axis=1)
+
         # Broadcast into a repeated array to match the shape of energy_diff_array
         mean_energy = np.transpose([mean_energy_single_col] * self.n_frames)
         # Array of energy fluctuations ( input for C(t) )
