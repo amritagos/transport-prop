@@ -51,3 +51,4 @@ class TCFparams:
     first_time_origin: int = 0
     first_lag_time: int = 1
     step_size_lag_time: int = 1  
+    num_blocks_for_block_avg: int = 1 
