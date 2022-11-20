@@ -179,7 +179,7 @@ def get_tcf_data_options(toml_filename):
     with p.open('rb') as f:
         data = tomli.load(f)
 
-    # Get the options for [msd] in the TOML file
+    # Get the options for [tcf] in the TOML file
     tcf_options = structures.TCFparams(**data.get('tcf'))
     return tcf_options
 
