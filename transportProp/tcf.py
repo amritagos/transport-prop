@@ -125,6 +125,15 @@ class SolvationTimeCorrelation():
         tcfList = [] # will be reshaped later 
         n_tau = 0 # Number of lag times 
 
+        # Finding C(0) at t=0
+        current_tau = 0;
+        current_tcf = self.e_tau_e_t0(self.energ_fluc[:, 0], self.energ_fluc[:, 0])
+        # Update the list of TCF values (1-D for now)
+        tcfList.append(current_tau)
+        tcfList.append(current_tcf)
+        # Update the number of lag times 
+        n_tau +=1; 
+
         # Loop over the lag times 
         for i_tau in range(self.start_tau, self.max_tau, self.delta_tau):
             n_tau += 1 
@@ -133,7 +142,7 @@ class SolvationTimeCorrelation():
             current_tcf = self.tcf_tau(current_tau)
             # print("current tau: ", i_tau)
             # print("current vacf: ", current_vacf)
-            # Update the list of VACF values (1-D for now)
+            # Update the list of TCF values (1-D for now)
             tcfList.append(current_tau)
             tcfList.append(current_tcf)
 
