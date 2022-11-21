@@ -118,6 +118,18 @@ class VelocityAutoCorrelation():
         vacfList = [] # will be reshaped later 
         n_tau = 0 # Number of lag times 
 
+        # Finding the VACF at t=0
+        current_tau = 0;
+        # Velocities at t=0
+        vel_0 = self.traj[0].get_velocities() # vx, vy, vz velocities 
+        current_vacf = self.self.v_tau_v_t0(vel_0, vel_0)
+        # Update the list of VACF values (1-D for now)
+        vacfList.append(current_tau)
+        for k in range(3):
+            vacfList.append(current_vacf[k])
+        # Update the number of lag times 
+        n_tau +=1; 
+
         # Loop over the lag times 
         for i_tau in range(self.start_tau, self.max_tau, self.delta_tau):
             n_tau += 1 
