@@ -27,3 +27,4 @@ dependencies:
   - isort==5.9.3
   - autoflake==1.4
   - flake8-docstrings==1.6.0
+  - typer

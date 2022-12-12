@@ -2,6 +2,7 @@ python==3.10
 ase
 numpy
 scipy
+typer
 moltemplate
 matplotlib
 ipython

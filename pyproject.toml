@@ -11,6 +11,9 @@ dynamic = ["version", "description"]
 [project.urls]
 Home = "https://english.hi.is/staff/amrita"
 
+[project.scripts]
+transportProp = "transportProp:app"
+
 [project.optional-dependencies]
 test = [
     "pytest==6.2.5",
