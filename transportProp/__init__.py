@@ -9,3 +9,4 @@ from .structures import *
 from .cli import * 
 from .vacf import * 
 from .tcf import * 
+from .util import *
