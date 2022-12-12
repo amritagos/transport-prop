@@ -8,7 +8,7 @@ class MSDparams:
     ''' Holds various parameters required to perform an MSD calculation.
     These can be read in from a TOML file  
     '''
-    trajectory: str
+    trajectory: str = None
     trajectory_file_type: str = None 
     max_lag_time: int = None 
     first_time_origin: int = 0
