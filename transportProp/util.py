@@ -17,14 +17,13 @@ from . import tcf
 def get_msd_data_options(toml_filename):
     ''' Read in the options for performing a mean-squared displacement calculation.
 
-    toml_filename: String with the name of the TOML file containing options for the MSD calculation.
+    toml_filename: Path object for TOML file containing options for the MSD calculation.
     Returns a structures.MSDparams object whose members have fields with the MSD options 
     such as the trajectory name, first lag time value, etc. 
     '''
-    p = pathlib.Path(toml_filename) # Path object for the TOML file
 
     # Read in the TOML file (as a binary file) 
-    with p.open('rb') as f:
+    with toml_filename.open('rb') as f:
         data = tomli.load(f)
 
     # Get the options for [msd] in the TOML file
