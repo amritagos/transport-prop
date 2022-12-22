@@ -30,7 +30,8 @@ def msd(
     firstorigin: int = typer.Option(None, min=0, help="A first time origin of 0 corresponds to the first configuration in the file. When not set by the user, this defaults to 0."),
     firstlag: int = typer.Option(None, min=1, help="The first lag time to calculate. When not specified, by default it is 1."),
     steplag: int = typer.Option(None, min=1, help="Step size in the lag times. When not specified, by default it is 1."),
-    dim: str = typer.Option(None, help="This decides whether to calculate the MSD in the x, y, z or all dimensions. By default it calculates all dimensions. Allowed values are x, y, z, xyz or all.")
+    dim: str = typer.Option(None, help="This decides whether to calculate the MSD in the x, y, z or all dimensions. By default it calculates all dimensions. Allowed values are x, y, z, xyz or all."),
+    outdir: Path = typer.Option(None, "-o", help="Path to the output directory. If not set, an output directory called output will be created.")
     ):
     """
     Calculates the mean-squared displacement. By default, the number of lag times is taken to be half of the 
@@ -39,7 +40,7 @@ def msd(
     """
     if tomlfile is not None:
         if not tomlfile.exists():
-            err_console.print("No TOML file")
+            err_console.print("No TOML file.")
             raise typer.Abort()
         # Read in the TOML file
         msd_options = util.get_msd_data_options(tomlfile)
@@ -73,15 +74,17 @@ def msd(
             err_console.print("Allowed values of dim are only: x, y, z, xyz, all.")
             raise typer.Abort()
         msd_options.dimension = dim
+    if outdir is None:
+        outdir = Path('output')
 
     # Calculate the MSD and write out the output files
-    util.perform_msd_calc(msd_options)
+    util.perform_msd_calc(msd_options, outdir)
 
 
 # Subcommands for the TCF
 @app.command()
 def tcf(
-    tomlfile: Optional[str] = typer.Argument(None, help="The TOML file that contains options for the MSD."),
+    tomlfile: Optional[Path] = typer.Argument(None, help="Path to the TOML file that contains options for the MSD."),
     traj: str = typer.Option(None, help="LAMMPS trajectory file, to be read in with ASE."),
     filetype: str = typer.Option(None, help="Trajectory file type, with the qualifier used by ASE, for instance, lammps-dump-text."),
     com: bool = typer.Option(True, "--com", help="When used, the centers of masses of the molecules are calculated. Currently hard-coded for water."),
@@ -89,7 +92,7 @@ def tcf(
     firstorigin: int = typer.Option(None, min=0, help="A first time origin of 0 corresponds to the first configuration in the file. When not set by the user, this defaults to 0."),
     firstlag: int = typer.Option(None, min=1, help="The first lag time to calculate. When not specified, by default it is 1."),
     steplag: int = typer.Option(None, min=1, help="Step size in the lag times. When not specified, by default it is 1."),
-    dim: str = typer.Option(None, help="This decides whether to calculate the MSD in the x, y, z or all dimensions. By default it calculates all dimensions. Allowed values are x, y, z, xyz or all.")
+    outdir: Path = typer.Option(None, "-o", help="Path to the output directory. If not set, an output directory called output will be created.")
     ):
     """
     Calculates the solvation time correlation, which is based on the energy gap between the solute and solvent
