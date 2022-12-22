@@ -12,6 +12,10 @@ log_excited_state = '1-excitedState/logfile/log-excitedState.txt'
 # in the LAMMPS log files.  
 energy_gap_key_string = 'c_solEnerg[0]'
 
+# Key string corresponding to the timestep value
+# in the LAMMPS log files. By default it is set to "Step"
+# timestep_key_string = 'Step'
+
 # The maximum lag time that will be calculated. 
 # By default, this is int(0.5* total number of steps)
 # max_lag_time =
