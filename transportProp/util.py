@@ -39,7 +39,7 @@ def perform_msd_calc(msd_options, output_path):
     The trajectory is then actually read in, to obtain a list of ASE Atoms objects corresponding to each configuration. 
     Then we create the MeanSquaredDisplacement object and calculate the MSD. 
 
-    Write out the output files relative to the current directory. 
+    Write out the output files given the output Path object 
     '''
     # If the file type has not been provided by the user, then the file format will be inferred 
     # by ASE from the filename
@@ -170,7 +170,7 @@ def get_tcf_data_options(toml_filename):
     Returns a structures.TCFparams object whose members have fields with the TCF options 
     such as the log file names, first lag time value, etc. 
     '''
-    
+
     # Read in the TOML file (as a binary file) 
     with toml_filename.open('rb') as f:
         data = tomli.load(f)
@@ -179,20 +179,18 @@ def get_tcf_data_options(toml_filename):
     tcf_options = structures.TCFparams(**data.get('tcf'))
     return tcf_options
 
-def perform_tcf_calc(tcf_options):
+def perform_tcf_calc(tcf_options, output_path):
     '''
     This function takes in a structures.TCFparams object, containing options for performing the TCF
     calculation. 
 
-    Two trajectories are processed. One trajectory has the per atom potential energies for one state, 
-    while the other one has per atom potential energies for the other state (but the same configuration). 
-    Currently there is only support for LAMMPS trajectory files (not binary). 
-    Each trajectory is read in, to obtain the potential energies required (the difference is used for the TCF
-    calculation) corresponding to each time step (and configuration).
-    The per atom potential energies must be present in the trajectory! 
+    Two log files are processed. One logfile should have the energy gaps for one state, 
+    while the other one has energy gaps (per timestep) for the other state (but the same configuration). 
+    Currently there is only support for LAMMPS log files. The key string or compute name for which 
+    the energy gap is saved in the log file is required.  
     Then we create the TimeCorrelation object and calculate the unnormalized TCF. 
 
-    Write out the output files relative to the current directory. 
+    Write out the output files relative to the current directory if no Path is given. 
     '''
     # If the file type has not been provided by the user, then the file format will be inferred 
     # by ASE from the filename
@@ -206,9 +204,7 @@ def perform_tcf_calc(tcf_options):
         atoms_traj1 = read(tcf_options.trajectory1, format=tcf_options.trajectory_file_type, index=':')
 
     # Make output directory
-    out_dir = 'output'
-    path = pathlib.Path(out_dir) # TODO: time stamp?
-    path.mkdir(parents=True, exist_ok=True) # Overwrite?
+    output_path.mkdir(parents=True, exist_ok=True)
 
     # Every Atoms list has the per atom potential energy information
     # available as a dictionary in each Atom object, accessible using a key. 
