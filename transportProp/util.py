@@ -166,14 +166,13 @@ def perform_vacf_calc(vacf_options):
 def get_tcf_data_options(toml_filename):
     ''' Read in the options for performing a solvation time correlation calculation ( C(t) ).
 
-    toml_filename: String with the name of the TOML file containing options for the TCF calculation.
+    toml_filename: Path object for TOML file containing options for the TCF calculation.
     Returns a structures.TCFparams object whose members have fields with the TCF options 
-    such as the trajectory name, first lag time value, etc. 
+    such as the log file names, first lag time value, etc. 
     '''
-    p = pathlib.Path(toml_filename) # Path object for the TOML file
-
+    
     # Read in the TOML file (as a binary file) 
-    with p.open('rb') as f:
+    with toml_filename.open('rb') as f:
         data = tomli.load(f)
 
     # Get the options for [tcf] in the TOML file
