@@ -28,3 +28,9 @@ dependencies:
   - autoflake==1.4
   - flake8-docstrings==1.6.0
   - typer
+  - meson
+  - pybind11
+  - invoke 
+  - pip:
+    # works for regular pip packages
+    - lammps-logfile
