@@ -10,6 +10,7 @@ from . import vacf
 from . import misc 
 from . import tcf
 from . import util
+# from . import fastcpp
 
 from typing import Optional
 import typer 
@@ -84,10 +85,10 @@ def msd(
 # Subcommands for the TCF
 @app.command()
 def tcf(
-    tomlfile: Optional[Path] = typer.Argument(None, help="Path to the TOML file that contains options for the MSD."),
-    traj: str = typer.Option(None, help="LAMMPS trajectory file, to be read in with ASE."),
-    filetype: str = typer.Option(None, help="Trajectory file type, with the qualifier used by ASE, for instance, lammps-dump-text."),
-    com: bool = typer.Option(True, "--com", help="When used, the centers of masses of the molecules are calculated. Currently hard-coded for water."),
+    tomlfile: Optional[Path] = typer.Argument(None, help="Path to the TOML file that contains options for the TCF."),
+    log0: str = typer.Option(None, help="LAMMPS log file, containing the energy gap for every timestep for the ground state."),
+    log1: str = typer.Option(None, help="LAMMPS log file, containing the energy gap for every timestep for the excited state."),
+    keystring: str = typer.Option(None, help="Qualifier or key string in the LAMMPS log file which denotes the energy gap value calculated for every timestep. For instance, c_solEnerg[0] could be a valid key string."),
     maxlag: int = typer.Option(None, min=1, help="Maximum lag time. When not specified, by default it is half the total number of steps."),
     firstorigin: int = typer.Option(None, min=0, help="A first time origin of 0 corresponds to the first configuration in the file. When not set by the user, this defaults to 0."),
     firstlag: int = typer.Option(None, min=1, help="The first lag time to calculate. When not specified, by default it is 1."),
@@ -100,37 +101,48 @@ def tcf(
     """
     if tomlfile is not None:
         # Read in the TOML file
-        msd_options = util.get_msd_data_options(tomlfile)
+        tcf_options = util.get_tcf_data_options(tomlfile)
     else:
-        msd_options = structures.MSDparams()
+        tcf_options = structures.TCFparams()
+
+    # print(fastcpp.add(3,4))
 
     # Optional arguments supercede the TOML file options
-    if traj is not None:
-          msd_options.trajectory = traj
+    # Ground state logfile
+    if log0 is not None:
+          tcf_options.log_ground_state = log0
+    # Excited state logfile
+    if log1 is not None:
+          tcf_options.log_excited_state = log1
+    # Key string for the computed energy gap values in the log files
+    if keystring is not None:
+        tcf_options.energy_gap_key_string = keystring
 
-    # Error handling for unspecified trajectory 
-    if msd_options.trajectory is None:
-        err_console.print("ERROR: You have not specified a trajectory file for the MSD calculation.")
+    # Error handling for unspecified ground state logfile 
+    if tcf_options.log_ground_state is None:
+        err_console.print("ERROR: You have not specified a log file (for the ground state), for the TCF calculation.")
         raise typer.Exit(code=1) # Exit with error  
+    # Error handling for unspecified excited state logfile 
+    if tcf_options.log_excited_state is None:
+        err_console.print("ERROR: You have not specified a log file (for the excited state), for the TCF calculation.")
+        raise typer.Exit(code=1) # Exit with error
+    # Error handling for unspecified key string in the log file  
+    if tcf_options.energy_gap_key_string is None:
+        err_console.print("ERROR: You have not specified a key string for reading energy gap values, for the TCF calculation.")
+        raise typer.Exit(code=1) # Exit with error
 
-    # Other CLI options for the MSD
-    if filetype is not None:
-        msd_options.trajectory_file_type = filetype
-    if com:
-        msd_options.use_center_of_mass = True
+    # Other CLI options for the TCF
     if maxlag is not None:
-        msd_options.max_lag_time = maxlag
+        tcf_options.max_lag_time = maxlag
     if firstorigin is not None:
-        msd_options.first_time_origin = firstorigin
+        tcf_options.first_time_origin = firstorigin
     if firstlag is not None:
-        msd_options.first_lag_time = firstlag
+        tcf_options.first_lag_time = firstlag
     if steplag is not None:
-        msd_options.step_size_lag_time = steplag
-    if dim is not None:
-        msd_options.dimension = dim
+        tcf_options.step_size_lag_time = steplag
 
-    # Calculate the MSD and write out the output files
-    util.perform_msd_calc(msd_options)
+    # Calculate the TCF and write out the output files
+    util.perform_tcf_calc(tcf_options)
 
 if __name__ == "__main__":
     app()
