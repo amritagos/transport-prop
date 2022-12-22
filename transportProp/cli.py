@@ -140,9 +140,11 @@ def tcf(
         tcf_options.first_lag_time = firstlag
     if steplag is not None:
         tcf_options.step_size_lag_time = steplag
+    if outdir is None:
+        outdir = Path('output')
 
     # Calculate the TCF and write out the output files
-    util.perform_tcf_calc(tcf_options)
+    util.perform_tcf_calc(tcf_options, outdir)
 
 if __name__ == "__main__":
     app()
