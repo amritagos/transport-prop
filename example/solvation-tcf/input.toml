@@ -1,24 +1,16 @@
 # Options for calculating the solvation time correlation function
 # Comment out if you want to use default values
-# Please note that the trajectory file path must be given (no default available) 
-# Two trajectories will be required, each containing the potential energy per atom
+# Two log file will be required, each containing the energy gap calculated
+# for every time step 
 [tcf]
-trajectory0 = 'dump-0/dump-nvt.lammpstrj'
-# Second trajectory, in the other state (but the same configurations);
-# The trajectories should be ordered the same way for convenience. 
-trajectory1 = 'dump-1/dump-nvt.lammpstrj'
+log_ground_state = '2-groundState/logfile/log-groundState.txt'
 
-# File format type according to ASE
-# If the trajectory_file_type is not specified by the user,
-# i.e., if the following line is commented out, then the file format  
-# will be inferred from the name of the file using the ASE io read in function.  
-trajectory_file_type = 'lammps-dump-text'
+# Second logfile, in the excited state (but the same configurations)
+log_excited_state = '1-excitedState/logfile/log-excitedState.txt'
 
-# Per-atom energy differences, calculated from two trajectory files
-# would be needed. In the LAMMPS trajectory file, the column corresponding
-# to the per atom energy in the trajectory file has this identifier
-# No default is available for this. 
-energy_key_string = 'c_peratom'
+# Key string corresponding to the energy gap (compute) value
+# in the LAMMPS log files.  
+energy_gap_key_string = 'c_solEnerg[0]'
 
 # The maximum lag time that will be calculated. 
 # By default, this is int(0.5* total number of steps)
@@ -34,9 +26,3 @@ first_lag_time = 1
 # Step size in the lag times. By default it is 1. 
 # Comment out to use the default value 
 step_size_lag_time = 1
-
-# Number of blocks to use to calculate the block average 
-# for the average energy, which will be used to calculate
-# energy difference fluctuations 
-# Comment this out to use the default value of 1 
-num_blocks_for_block_avg = 10
