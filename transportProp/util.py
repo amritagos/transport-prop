@@ -31,7 +31,7 @@ def get_msd_data_options(toml_filename):
     return msd_options
 
 
-def perform_msd_calc(msd_options):
+def perform_msd_calc(msd_options, output_path):
     '''
     This function takes in a structures.MSDparams object, containing options for performing the MSD
     calculation. 
@@ -50,9 +50,7 @@ def perform_msd_calc(msd_options):
         atoms_traj = read(msd_options.trajectory, format=msd_options.trajectory_file_type, index=':')
 
     # Make output directory
-    out_dir = 'output'
-    path = pathlib.Path(out_dir) # TODO: time stamp?
-    path.mkdir(parents=True, exist_ok=True) 
+    output_path.mkdir(parents=True, exist_ok=True) 
 
     # Get the center of masses 
     # TODO: make this more general
@@ -69,7 +67,7 @@ def perform_msd_calc(msd_options):
         # Calculate the MSD
         msdList = msd_obj.calculate_msd()
         # Write out to file
-        np.savetxt(out_dir+'/msd-'+'x'+'.txt', msdList, delimiter=' ') 
+        np.savetxt(str(output_path)+'/msd-'+'x'+'.txt', msdList, delimiter=' ') 
         ## Y dimension
         msd_obj = msd.MeanSquaredDisplacement(atoms_traj, max_tau = msd_options.max_lag_time, 
             start_t0 = msd_options.first_time_origin, start_tau = msd_options.first_lag_time, 
@@ -77,7 +75,7 @@ def perform_msd_calc(msd_options):
         # Calculate the MSD
         msdList = msd_obj.calculate_msd()
         # Write out to file
-        np.savetxt(out_dir+'/msd-'+'y'+'.txt', msdList, delimiter=' ') 
+        np.savetxt(str(output_path)+'/msd-'+'y'+'.txt', msdList, delimiter=' ') 
         ## Z dimension
         msd_obj = msd.MeanSquaredDisplacement(atoms_traj, max_tau = msd_options.max_lag_time, 
             start_t0 = msd_options.first_time_origin, start_tau = msd_options.first_lag_time, 
@@ -85,7 +83,7 @@ def perform_msd_calc(msd_options):
         # Calculate the MSD
         msdList = msd_obj.calculate_msd()
         # Write out to file
-        np.savetxt(out_dir+'/msd-'+'z'+'.txt', msdList, delimiter=' ') 
+        np.savetxt(str(output_path)+'/msd-'+'z'+'.txt', msdList, delimiter=' ') 
         ## X, Y, Z dimensions combined 
         msd_obj = msd.MeanSquaredDisplacement(atoms_traj, max_tau = msd_options.max_lag_time, 
             start_t0 = msd_options.first_time_origin, start_tau = msd_options.first_lag_time, 
@@ -93,7 +91,7 @@ def perform_msd_calc(msd_options):
         # Calculate the MSD
         msdList = msd_obj.calculate_msd()
         # Write out to file
-        np.savetxt(out_dir+'/msd-'+'xyz'+'.txt', msdList, delimiter=' ') 
+        np.savetxt(str(output_path)+'/msd-'+'xyz'+'.txt', msdList, delimiter=' ') 
     else:
         ## the dimension provided by the user 
         msd_obj = msd.MeanSquaredDisplacement(atoms_traj, max_tau = msd_options.max_lag_time, 
@@ -102,7 +100,7 @@ def perform_msd_calc(msd_options):
         # Calculate the MSD
         msdList = msd_obj.calculate_msd()
         # Write out to file
-        np.savetxt(out_dir+'/msd-'+msd_options.dimension+'.txt', msdList, delimiter=' ') 
+        np.savetxt(str(output_path)+'/msd-'+msd_options.dimension+'.txt', msdList, delimiter=' ') 
 
 
 def get_vacf_data_options(toml_filename):
