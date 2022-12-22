@@ -46,6 +46,7 @@ class TCFparams:
     log_ground_state: str = None
     log_excited_state: str = None 
     energy_gap_key_string: str = None
+    timestep_key_string: str = 'Step'
     max_lag_time: int = None 
     first_time_origin: int = 0
     first_lag_time: int = 1

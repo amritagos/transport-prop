@@ -7,6 +7,7 @@ import tomli # For reading the TOML file
 import numpy as np
 from ase.atoms import Atoms # ASE stuff 
 from ase.io import read, write, lammpsrun 
+import lammps_logfile 
 
 from . import structures 
 from . import msd 
@@ -179,7 +180,7 @@ def get_tcf_data_options(toml_filename):
     tcf_options = structures.TCFparams(**data.get('tcf'))
     return tcf_options
 
-def perform_tcf_calc(tcf_options, output_path):
+def perform_tcf_calc(tcf_options, output_path, printtime, timestring):
     '''
     This function takes in a structures.TCFparams object, containing options for performing the TCF
     calculation. 
@@ -192,16 +193,14 @@ def perform_tcf_calc(tcf_options, output_path):
 
     Write out the output files relative to the current directory if no Path is given. 
     '''
-    # If the file type has not been provided by the user, then the file format will be inferred 
-    # by ASE from the filename
-    # Trajectory for state 0 and state 1 
-    if tcf_options.trajectory_file_type is None:
-        # Read in all the steps 
-        atoms_traj0 = read(tcf_options.trajectory0, index=':')
-        atoms_traj1 = read(tcf_options.trajectory1, index=':')
-    else:
-        atoms_traj0 = read(tcf_options.trajectory0, format=tcf_options.trajectory_file_type, index=':')
-        atoms_traj1 = read(tcf_options.trajectory1, format=tcf_options.trajectory_file_type, index=':')
+    # Read the log files for the ground and excited states
+    log_excited = lammps_logfile.File(tcf_options.log_excited_state)
+    log_ground = lammps_logfile.File(tcf_options.log_ground_state)
+
+    # Get the numPy arrays (of length nsteps) for the energy gaps
+    # for the ground and excited states 
+    energ_ground = log_ground.get(tcf_options.energy_gap_key_string)
+    energ_excited = log_excited.get(tcf_options.energy_gap_key_string)
 
     # Make output directory
     output_path.mkdir(parents=True, exist_ok=True)

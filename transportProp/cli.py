@@ -89,6 +89,8 @@ def tcf(
     log0: str = typer.Option(None, help="LAMMPS log file, containing the energy gap for every timestep for the ground state."),
     log1: str = typer.Option(None, help="LAMMPS log file, containing the energy gap for every timestep for the excited state."),
     keystring: str = typer.Option(None, help="Qualifier or key string in the LAMMPS log file which denotes the energy gap value calculated for every timestep. For instance, c_solEnerg[0] could be a valid key string."),
+    printdata: bool = typer.Option(True, "--print", help="When used, the timesteps and energy gap difference fluctuation arrays will be printed out from the log files."),
+    timestring: str = typer.Option(None, help="Qualifier or key string in the LAMMPS log file for printing out the time steps."),
     maxlag: int = typer.Option(None, min=1, help="Maximum lag time. When not specified, by default it is half the total number of steps."),
     firstorigin: int = typer.Option(None, min=0, help="A first time origin of 0 corresponds to the first configuration in the file. When not set by the user, this defaults to 0."),
     firstlag: int = typer.Option(None, min=1, help="The first lag time to calculate. When not specified, by default it is 1."),
@@ -142,9 +144,13 @@ def tcf(
         tcf_options.step_size_lag_time = steplag
     if outdir is None:
         outdir = Path('output')
+    if timestring is not None:
+        tcf_options.timestep_key_string = timestring
+    if not printdata:
+        printdata = False
 
     # Calculate the TCF and write out the output files
-    util.perform_tcf_calc(tcf_options, outdir)
+    util.perform_tcf_calc(tcf_options, outdir, printdata)
 
 if __name__ == "__main__":
     app()
