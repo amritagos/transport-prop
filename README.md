@@ -24,15 +24,13 @@ conda activate trnsprtProp
 ```
 To deactivate the environment, just use `micromamba deactivate`. 
 
-To work with the `Python` module (since it is Python only), we have used `flit` to handle
-builds. This supports editable
-installs, which means that the package does not need to be reinstalled
-explicitly on changes. 
+Although this started out as a purely `Python` module (we started out using `flit`), we now use `pybind11`. Now we use `invoke` and `meson`. 
 
-So, in order to install the `Python` code, all you have to do is run the following command in the top-level directory:
+In order to install the code, run the following:
 
 ```bash
-pip install -e .
+inv build # flit build
+inv build --install
 ```
 
 ### With `venv`
@@ -46,7 +44,12 @@ source envName/bin/activate
 
 Install the dependencies using the `requirements.txt` file, using `python3 -m pip install -r requirements.txt` (check out the [docs](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) for Windows). 
 
-To install the module, run the command `pip install -e .` in editable mode. 
+To install the module, run the following:
+
+```bash
+inv build # flit build
+inv build --install
+```
 
 ## Tests
 
@@ -58,7 +61,27 @@ pytest
 
 In order to debug tests using `pdb`, you can write the command `breakpoint()` inside the `Python` files (in `tests`) wherever you want to set a breakpoint. Then, run `pytest --pdb`. This will stop the code at the line where you put the `breakpoint()` command. 
 
-To see more verbose output from `pytest`, including tests that pass, you can run `pytest -rA`. 
+To see more verbose output from `pytest`, including tests that pass, you can run `pytest -rA`.
+
+## Running the code
+
+This program can be run from the command-line using the following: 
+
+```bash
+transportProp
+``` 
+
+Help options can be accessed using:
+
+```bash
+transportProp --help 
+```
+
+Options for subcommands can be run, for instance: 
+
+```bash
+transportProp msd --help
+```
 
 ## Validation 
 
