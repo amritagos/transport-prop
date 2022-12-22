@@ -39,16 +39,14 @@ class VACFparams:
 @dataclass
 class TCFparams:
     ''' Parameters required for a solvation TCF calculation. 
-    Per-atom energy differences, calculated from two trajectory files
+    Energy gap values, from two log files
     would be needed. 
     These options can be read in from a TOML file. 
     '''
-    trajectory0: str
-    trajectory1: str
-    energy_key_string: str 
-    trajectory_file_type: str = None
+    log_ground_state: str = None
+    log_excited_state: str = None 
+    energy_gap_key_string: str = None
     max_lag_time: int = None 
     first_time_origin: int = 0
     first_lag_time: int = 1
     step_size_lag_time: int = 1  
-    num_blocks_for_block_avg: int = 1 
