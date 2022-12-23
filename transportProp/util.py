@@ -9,11 +9,16 @@ from ase.atoms import Atoms # ASE stuff
 from ase.io import read, write, lammpsrun 
 import lammps_logfile 
 
+import typer 
+from rich.console import Console
+
 from . import structures 
 from . import msd 
 from . import vacf
 from . import misc 
 from . import tcf
+
+err_console = Console(stderr=True)
 
 def get_msd_data_options(toml_filename):
     ''' Read in the options for performing a mean-squared displacement calculation.
@@ -180,7 +185,7 @@ def get_tcf_data_options(toml_filename):
     tcf_options = structures.TCFparams(**data.get('tcf'))
     return tcf_options
 
-def perform_tcf_calc(tcf_options, output_path, printtime, timestring):
+def perform_tcf_calc(tcf_options, output_path, printdata):
     '''
     This function takes in a structures.TCFparams object, containing options for performing the TCF
     calculation. 
@@ -201,23 +206,37 @@ def perform_tcf_calc(tcf_options, output_path, printtime, timestring):
     # for the ground and excited states 
     energ_ground = log_ground.get(tcf_options.energy_gap_key_string)
     energ_excited = log_excited.get(tcf_options.energy_gap_key_string)
+    # Get the time from the logfile 
+    timestep = log_ground.get(tcf_options.timestep_key_string)
+    timestep2 = log_perturbed.get(tcf_options.timestep_key_string) # should be the same as timestep
+
+    # Check that timestep and timestep2 are the same: 
+    if not np.array_equal(timestep, timestep2):
+        err_console.print("ERROR: The time series for the ground and excited states are not of the same length.")
+        raise typer.Exit(code=1) # Exit with error
 
     # Make output directory
     output_path.mkdir(parents=True, exist_ok=True)
 
-    # Every Atoms list has the per atom potential energy information
-    # available as a dictionary in each Atom object, accessible using a key. 
-    #  
-    # However, the fluctuation in the difference in energy is what will be processed. Get the energy
-    # difference as a numPy array, with size (natoms, timesteps); timesteps start from start_t0  
-    energy_diff_array = misc.get_energy_difference(atoms_traj0, atoms_traj1, 
-        key_value=tcf_options.energy_key_string, start_t0=tcf_options.first_time_origin)
+    # Energy gap difference E(t) between the ground and excited states  
+    delta_energy = energ_excited - energ_ground
 
-    ## Solvation TCF calculation, given the potential energy difference array  
-    tcf_obj = tcf.SolvationTimeCorrelation(energy_diff_array, max_tau = tcf_options.max_lag_time, 
-        start_tau = tcf_options.first_lag_time, delta_tau = tcf_options.step_size_lag_time)
-    # Calculate the TCF
-    tcfList = tcf_obj.calculate_tcf()
+    # Average over all frames
+    mean_energy = np.mean(delta_energy)
+    # Fluctuations (of size n_frames) w.r.t. to the mean for this trajectory 
+    energ_fluc = delta_energy - mean_energy
+
+    # Save the timestep data and energy fluctuations 
+    # to the output directory
+    if printdata:
+        np.savetxt(str(output_path)+"/energ_fluc.csv", energ_fluc, delimiter=",")
+        np.savetxt(str(output_path)+"/time.csv", timestep, delimiter=",")
+
+    # ## Solvation TCF calculation, given the potential energy difference array  
+    # tcf_obj = tcf.SolvationTimeCorrelation(energy_diff_array, max_tau = tcf_options.max_lag_time, 
+    #     start_tau = tcf_options.first_lag_time, delta_tau = tcf_options.step_size_lag_time)
+    # # Calculate the TCF
+    # tcfList = tcf_obj.calculate_tcf()
 
     # Write out to file
-    np.savetxt(out_dir+'/tcf'+'.txt', tcfList, delimiter=' ', header = 'tau     solv_tcf') 
+    np.savetxt(str(output_path)+'/tcf'+'.txt', tcfList, delimiter=' ', header = 'tau     solv_tcf') 
