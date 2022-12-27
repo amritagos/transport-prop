@@ -298,3 +298,5 @@ dkms.conf
 # End of https://www.toptal.com/developers/gitignore/api/git
 ### Directory of build file ###
 bbdir
+# GDB 
+.gdb_history
