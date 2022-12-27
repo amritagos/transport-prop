@@ -6,7 +6,7 @@ py = import('python').find_installation()
 python_dep = py.dependency()
 pyb11f = py.extension_module('fastcpp',
           sources : [
-            'add.cpp',
+            'tcf.cpp',
             'binding.cpp'
                     ],
           dependencies : [dependency('fmt'),
