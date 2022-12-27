@@ -5,6 +5,7 @@ __all__ = [ 'get_msd_data_options', 'perform_msd_calc', 'get_vacf_data_options',
 import pathlib 
 import tomli # For reading the TOML file 
 import numpy as np
+import math 
 from ase.atoms import Atoms # ASE stuff 
 from ase.io import read, write, lammpsrun 
 import lammps_logfile 
@@ -17,6 +18,7 @@ from . import msd
 from . import vacf
 from . import misc 
 from . import tcf
+from . import fastcpp
 
 err_console = Console(stderr=True)
 
@@ -208,7 +210,7 @@ def perform_tcf_calc(tcf_options, output_path, printdata):
     energ_excited = log_excited.get(tcf_options.energy_gap_key_string)
     # Get the time from the logfile 
     timestep = log_ground.get(tcf_options.timestep_key_string)
-    timestep2 = log_perturbed.get(tcf_options.timestep_key_string) # should be the same as timestep
+    timestep2 = log_excited.get(tcf_options.timestep_key_string) # should be the same as timestep
 
     # Check that timestep and timestep2 are the same: 
     if not np.array_equal(timestep, timestep2):
@@ -220,6 +222,9 @@ def perform_tcf_calc(tcf_options, output_path, printdata):
 
     # Energy gap difference E(t) between the ground and excited states  
     delta_energy = energ_excited - energ_ground
+
+    # Number of frames
+    n_frames = delta_energy.shape[0] # Number of times for which E(t) is available
 
     # Average over all frames
     mean_energy = np.mean(delta_energy)
@@ -238,5 +243,16 @@ def perform_tcf_calc(tcf_options, output_path, printdata):
     # # Calculate the TCF
     # tcfList = tcf_obj.calculate_tcf()
 
+    # By default, max_tau is the rounded down integer value of half of the total number of frames. 
+    # Then, for every tau, the TCF is averaged over the same number of times.
+    if tcf_options.max_lag_time is None:
+        max_tau = math.floor(0.5*n_frames)
+    elif tcf_options.max_lag_time >  math.floor(0.5*n_frames):
+        max_tau = math.floor(0.5*n_frames) # to ensure averaging over the same number of time origins
+    else:
+        max_tau = tcf_options.max_lag_time
+
+    fastcpp.test(energ_fluc, timestep, max_tau)
+
     # Write out to file
-    np.savetxt(str(output_path)+'/tcf'+'.txt', tcfList, delimiter=' ', header = 'tau     solv_tcf') 
+    # np.savetxt(str(output_path)+'/tcf'+'.txt', tcfList, delimiter=' ', header = 'tau     solv_tcf') 
