@@ -33,24 +33,6 @@ inv build # flit build
 inv build --install
 ```
 
-### With `venv`
-
-If you would prefer to use a virtual environment using `venv`, run the following to create and activate a virtual environment: 
-
-```bash
-python3 -m venv envName
-source envName/bin/activate
-```
-
-Install the dependencies using the `requirements.txt` file, using `python3 -m pip install -r requirements.txt` (check out the [docs](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) for Windows). 
-
-To install the module, run the following:
-
-```bash
-inv build # flit build
-inv build --install
-```
-
 ## Tests
 
 To run tests (which are inside the `tests` directory), written with `pytest`, run the following command from the top-level directory: 
