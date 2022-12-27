@@ -12,5 +12,6 @@ pyb11f = py.extension_module('fastcpp',
           dependencies : [dependency('fmt'),
                           dependency('python3'),
                           dependency('pybind11'),
+                          dependency('eigen3'),
                          declare_dependency(link_args: '-lstdc++')],
           install : true)

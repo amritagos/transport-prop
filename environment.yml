@@ -10,6 +10,7 @@ dependencies:
   - ase
   - numpy
   - scipy
+  - eigen
   - moltemplate
   - matplotlib
   - ipython
