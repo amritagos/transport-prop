@@ -1,14 +1,14 @@
 import transportProp as trp
-import numpy as np
-import ase
-from ase.atoms import Atom, Atoms # ASE stuff 
-import pathlib
-from ase.io import read, write, lammpsrun 
+from pathlib import Path
 
-from transportProp import structures, cli 
+from transportProp import structures, util
+
+## For testing with gdb
+# Run the following: 
+# gdb -args python run.py 
 
 # # Read in the TOML file 
-tcf_options = cli.get_tcf_data_options('input.toml')
+tcf_options = util.get_tcf_data_options(Path('input.toml'))
 
 # Do the calculation 
-cli.perform_tcf_calc(tcf_options)
+util.perform_tcf_calc(tcf_options, Path('output'), True)
