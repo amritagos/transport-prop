@@ -252,7 +252,9 @@ def perform_tcf_calc(tcf_options, output_path, printdata):
     else:
         max_tau = tcf_options.max_lag_time
 
-    fastcpp.test(energ_fluc, timestep, max_tau)
+    fastcpp.test(energ_fluc, timestep, max_tau, 
+        tcf_options.first_time_origin, tcf_options.first_lag_time,
+        tcf_options.step_size_lag_time)
 
     # Write out to file
     # np.savetxt(str(output_path)+'/tcf'+'.txt', tcfList, delimiter=' ', header = 'tau     solv_tcf') 
