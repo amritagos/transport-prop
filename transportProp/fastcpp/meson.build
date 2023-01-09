@@ -1,6 +1,7 @@
 project('fastcpp', 'cpp',
  version : run_command('git', 'rev-parse',  '--short', 'HEAD').stdout().strip(),
-  default_options : ['warning_level=3', 'cpp_std=c++20', 'debug=true', 'buildtype=debug'])
+  # default_options : ['warning_level=3', 'cpp_std=c++20', 'debug=true', 'buildtype=debug'])
+  default_options : ['warning_level=3', 'cpp_std=c++20', 'debug=false', 'buildtype=release'])
 
 py = import('python').find_installation()
 python_dep = py.dependency()
