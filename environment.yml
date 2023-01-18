@@ -5,18 +5,27 @@
 name: trnsprtProp
 channels:
   - conda-forge
+# requirements:
+#   build:
+#     - {{ compiler('c') }}
+#     - {{ compiler('c++') }}
 dependencies:
   - python==3.10
   - ase
   - numpy
   - scipy
+  - fmt
   - eigen
+  - pkg-config
   - moltemplate
   - matplotlib
   - ipython
   - pandas 
   - statsmodels
   - ipykernel 
+  # - cmake
+    #- gcc
+    # - clang
   # Packaging
   - flit
   - pytest==6.2.5
