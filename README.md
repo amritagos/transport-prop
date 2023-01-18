@@ -4,6 +4,8 @@ This repository is meant to enable calculations of transport properties from equ
 
 ## Installation
 
+We assume the existence of a reasonable build tool-chain. This means on an HPC you might need something like (on `elja`) `ml load GCC`.
+
 ### With `micromamba` or `conda` 
 
 To install into a `micromamba` (or `conda`) environment, please follow the following steps. The `Python` dependencies are inside `environment.yml`. Create the environment using the following command, inside the top-level directory: 
