@@ -95,7 +95,8 @@ def tcf(
     firstorigin: int = typer.Option(None, min=0, help="A first time origin of 0 corresponds to the first configuration in the file. When not set by the user, this defaults to 0."),
     firstlag: int = typer.Option(None, min=1, help="The first lag time to calculate. When not specified, by default it is 1."),
     steplag: int = typer.Option(None, min=1, help="Step size in the lag times. When not specified, by default it is 1."),
-    outdir: Path = typer.Option(None, "-o", help="Path to the output directory. If not set, an output directory called output will be created.")
+    outdir: Path = typer.Option(None, "-o", help="Path to the output directory. If not set, an output directory called output will be created."),
+    every: int = typer.Option(None, help="Skip data every specified number of steps, starting from the first value at t=0.")
     ):
     """
     Calculates the solvation time correlation, which is based on the energy gap between the solute and solvent
@@ -148,9 +149,11 @@ def tcf(
         tcf_options.timestep_key_string = timestring
     if not printdata:
         printdata = False
+    if every is not None:
+        skip_every = every
 
     # Calculate the TCF and write out the output files
-    util.perform_tcf_calc(tcf_options, outdir, printdata)
+    util.perform_tcf_calc(tcf_options, outdir, skip_every, printdata)
 
 if __name__ == "__main__":
     app()

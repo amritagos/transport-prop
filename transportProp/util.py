@@ -187,7 +187,7 @@ def get_tcf_data_options(toml_filename):
     tcf_options = structures.TCFparams(**data.get('tcf'))
     return tcf_options
 
-def perform_tcf_calc(tcf_options, output_path, printdata):
+def perform_tcf_calc(tcf_options, output_path, skip_every, printdata):
     '''
     This function takes in a structures.TCFparams object, containing options for performing the TCF
     calculation. 
@@ -216,6 +216,11 @@ def perform_tcf_calc(tcf_options, output_path, printdata):
     if not np.array_equal(timestep, timestep2):
         err_console.print("ERROR: The time series for the ground and excited states are not of the same length.")
         raise typer.Exit(code=1) # Exit with error
+
+    if skip_every is not None:
+        energ_ground = np.array(energ_ground[0::int(skip_every)])
+        energ_excited = np.array(energ_excited[0::int(skip_every)])
+        timestep = np.array(timestep[0::int(skip_every)])
 
     # Make output directory
     output_path.mkdir(parents=True, exist_ok=True)
