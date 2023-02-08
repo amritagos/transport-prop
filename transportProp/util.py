@@ -2,7 +2,7 @@
 __all__ = [ 'get_msd_data_options', 'perform_msd_calc', 'get_vacf_data_options', 'perform_vacf_calc',
 'get_tcf_data_options', 'perform_tcf_calc']
 
-import pathlib 
+from pathlib import Path 
 import tomli # For reading the TOML file 
 import numpy as np
 import math 
@@ -17,7 +17,6 @@ from . import structures
 from . import msd 
 from . import vacf
 from . import misc 
-from . import tcf
 from . import fastcpp
 
 err_console = Console(stderr=True)
@@ -118,7 +117,7 @@ def get_vacf_data_options(toml_filename):
     Returns a structures.VACFparams object whose members have fields with the VACF options 
     such as the trajectory name, first lag time value, etc. 
     '''
-    p = pathlib.Path(toml_filename) # Path object for the TOML file
+    p = Path(toml_filename) # Path object for the TOML file
 
     # Read in the TOML file (as a binary file) 
     with p.open('rb') as f:
@@ -149,7 +148,7 @@ def perform_vacf_calc(vacf_options):
 
     # Make output directory
     out_dir = 'output'
-    path = pathlib.Path(out_dir) # TODO: time stamp?
+    path = Path(out_dir) # TODO: time stamp?
     path.mkdir(parents=True, exist_ok=True) # Overwrite?
 
     # Get the center of masses 
@@ -263,4 +262,67 @@ def perform_tcf_calc(tcf_options, output_path, skip_every, printdata):
 
     # Write out to file  
     header_string = 'tau\tsolv_tcf\tC(0)=' + str(mean_t01)
-    np.savetxt(str(output_path)+'/tcf'+'.txt', np.column_stack((tau_val, tcf_val)), delimiter=' ', header = header_string) 
+    np.savetxt(str(output_path)+'/tcf'+'.txt', np.column_stack((tau_val, tcf_val)), delimiter=' ', header = header_string)
+
+def get_rdf_peakData_time(input_traj_path, typeO, typeIon, binwidth, cutoff, 
+    print_data=False, output_path=None):
+    '''
+    This function finds the time-dependent RDF for a trajectories (replicas), averages over them and outputs 
+    the height of the first peak and the position of the first maximum, with time. 
+
+    Write out the output files relative to the current directory if no Path is given. 
+    '''
+    peak_heights = [] # g(r) value of the first peak 
+    peak_pos = [] # r value for the maximum of g(r)
+
+    # Make output directory
+    if output_path is None:
+        output_path = Path('output')
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    # Read in the entire trajectory as a list of ASE Atom objects 
+    atoms_traj = read(input_traj_path, index=':')
+
+    # Calculate the number of bins, given the cutoff and binwidth 
+    nbin = round(cutoff/binwidth) # 1 + round(cutoff/binwidth)
+    r_grid = np.zeros(nbin)
+    # Get the grid points
+    for i in range(nbin):
+        r_grid[i] = binwidth * (i+0.5)
+
+    # Loop through the trajectory 
+    count = 0
+    for atoms in atoms_traj:
+        count += 1 
+        # New Atoms objects for ions and O atoms 
+        atoms_ions = Atoms()
+        atomsO = Atoms()
+        # Get the Atoms for O and ions
+        for atom in atoms:
+            # For the ions:
+            if atom.number == typeIon:
+                atoms_ions += atom
+            elif atom.number == typeO:
+                atomsO += atom
+        # Get lower box limits and higher box limits
+        # Assuming pbcs
+        box = atoms.cell.diagonal() # box lengths in every dimension 
+        # boxLow = atoms.get_celldisp()
+        # boxHigh = boxLow + atoms.cell.diagonal()
+        # Get the positions of the ion and O atoms 
+        pos_ions = atoms_ions.get_positions() 
+        posO = atomsO.get_positions()
+
+        # Call the rdf function from fastcpp
+        rdf = fastcpp.calc_rdf(pos_ions,posO,box,binwidth,nbin,cutoff)
+
+        if print_data:
+            header_string = 'r\tg(r)'
+            np.savetxt(str(output_path)+'/rdf'+str(count)+'.txt', np.column_stack((r_grid, rdf)), delimiter=' ', header = header_string)
+
+        # Get the maximum of the RDF 
+        peak_heights.append( np.amax(rdf) )
+        i_max = rdf.argmax()
+        peak_pos.append( r_grid[i_max] )
+
+    return ( np.array(peak_pos), np.array(peak_heights) )
