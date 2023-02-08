@@ -267,7 +267,8 @@ def perform_tcf_calc(tcf_options, output_path, skip_every, printdata):
 def get_rdf_peakData_time(input_traj_path, typeO, typeIon, binwidth, cutoff, 
     print_data=False, output_path=None):
     '''
-    This function finds the time-dependent RDF for a trajectories (replicas), averages over them and outputs 
+    This function finds the peak heights and peak positions of the
+    time-dependent RDF for a particular trajectory (replicas); outputting  
     the height of the first peak and the position of the first maximum, with time. 
 
     Write out the output files relative to the current directory if no Path is given. 
@@ -326,3 +327,67 @@ def get_rdf_peakData_time(input_traj_path, typeO, typeIon, binwidth, cutoff,
         peak_pos.append( r_grid[i_max] )
 
     return ( np.array(peak_pos), np.array(peak_heights) )
+
+def get_time_averaged_rdf(input_traj_path, typeO, typeIon, binwidth, cutoff, 
+    print_data=False, output_path=None):
+    '''
+    This function finds the time-averaged RDF for a trajectory. 
+
+    Write out the output files relative to the current directory if no Path is given. 
+    '''
+
+    # Make output directory
+    if output_path is None:
+        output_path = Path('output')
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    # Read in the entire trajectory as a list of ASE Atom objects 
+    atoms_traj = read(input_traj_path, index=':')
+
+    # Calculate the number of bins, given the cutoff and binwidth 
+    nbin = round(cutoff/binwidth) # 1 + round(cutoff/binwidth)
+    r_grid = np.zeros(nbin)
+    # Get the grid points
+    for i in range(nbin):
+        r_grid[i] = binwidth * (i+0.5)
+
+    # Define the averaged RDF array 
+    rdf_avg = np.zeros(nbin)
+
+    # Loop through the trajectory 
+    count = 0
+    for atoms in atoms_traj:
+        count += 1 
+        # New Atoms objects for ions and O atoms 
+        atoms_ions = Atoms()
+        atomsO = Atoms()
+        # Get the Atoms for O and ions
+        for atom in atoms:
+            # For the ions:
+            if atom.number == typeIon:
+                atoms_ions += atom
+            elif atom.number == typeO:
+                atomsO += atom
+        # Get lower box limits and higher box limits
+        # Assuming pbcs
+        box = atoms.cell.diagonal() # box lengths in every dimension 
+        # boxLow = atoms.get_celldisp()
+        # boxHigh = boxLow + atoms.cell.diagonal()
+        # Get the positions of the ion and O atoms 
+        pos_ions = atoms_ions.get_positions() 
+        posO = atomsO.get_positions()
+
+        # Call the rdf function from fastcpp
+        rdf = fastcpp.calc_rdf(pos_ions,posO,box,binwidth,nbin,cutoff)
+
+        if print_data:
+            header_string = 'r\tg(r)'
+            np.savetxt(str(output_path)+'/rdf'+str(count)+'.txt', np.column_stack((r_grid, rdf)), delimiter=' ', header = header_string)
+
+        # Append to the averaged RDF 
+        rdf_avg = np.add( rdf_avg,rdf )
+
+    # Divide by the total number of timesteps (count here)
+    rdf_avg = rdf_avg/count
+
+    return ( r_grid, rdf_avg )
