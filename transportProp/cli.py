@@ -8,7 +8,6 @@ from . import structures
 from . import msd 
 from . import vacf
 from . import misc 
-from . import tcf
 from . import util
 # from . import fastcpp
 
