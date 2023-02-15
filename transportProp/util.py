@@ -241,12 +241,6 @@ def perform_tcf_calc(tcf_options, output_path, skip_every, printdata):
         np.savetxt(str(output_path)+"/energ_fluc.csv", energ_fluc, delimiter=",")
         np.savetxt(str(output_path)+"/time.csv", timestep, delimiter=",")
 
-    # ## Solvation TCF calculation, given the potential energy difference array  
-    # tcf_obj = tcf.SolvationTimeCorrelation(energy_diff_array, max_tau = tcf_options.max_lag_time, 
-    #     start_tau = tcf_options.first_lag_time, delta_tau = tcf_options.step_size_lag_time)
-    # # Calculate the TCF
-    # tcfList = tcf_obj.calculate_tcf()
-
     # By default, max_tau is the rounded down integer value of half of the total number of frames. 
     # Then, for every tau, the TCF is averaged over the same number of times.
     if tcf_options.max_lag_time is None:
@@ -256,13 +250,13 @@ def perform_tcf_calc(tcf_options, output_path, skip_every, printdata):
     else:
         max_tau = tcf_options.max_lag_time
 
-    tau_val, tcf_val, mean_t01 = fastcpp.time_corr_function(energ_fluc, timestep, max_tau, 
+    tcf_mat, tcf_err, mean_t01 = fastcpp.time_corr_function(energ_fluc, timestep, max_tau, 
         tcf_options.first_time_origin, tcf_options.first_lag_time,
         tcf_options.step_size_lag_time)
 
     # Write out to file  
-    header_string = 'tau\tsolv_tcf\tC(0)=' + str(mean_t01)
-    np.savetxt(str(output_path)+'/tcf'+'.txt', np.column_stack((tau_val, tcf_val)), delimiter=' ', header = header_string)
+    header_string = 'tau\tsolv_tcf\ttcf_stderr\tC(0)=' + str(mean_t01)
+    np.savetxt(str(output_path)+'/tcf'+'.txt', np.column_stack((tcf_mat, tcf_err)), delimiter=' ', header = header_string)
 
 def get_rdf_peakData_time(input_traj_path, typeO, typeIon, binwidth, cutoff, 
     print_data=False, output_path=None):
