@@ -5,6 +5,7 @@ from pathlib import Path
 from ase.build import molecule
 from ase import Atoms, Atom
 import numpy as np
+from scipy.optimize import curve_fit
 
 def getpath(*a):
     ''' Get the directory in which the current file lives 
@@ -138,3 +139,34 @@ def get_energy_difference(atoms_traj0, atoms_traj1, key_value, start_t0):
 
     # Return the numPy array 
     return energy0-energy1
+
+def quadratic(x, a, b, c):
+    """The quadratic function to fit."""
+    return a * x**2 + b * x + c
+
+def two_part_quadratic_fit(x, y):
+    """Perform a two-part quadratic fitting procedure on the given data."""
+    
+    # Find the maximum value and its index
+    max_index = np.argmax(y)
+    max_x = x[max_index]
+    
+    # Fit a quadratic using 10 points on either side of the maximum value
+    left_index = max(0, max_index - 10)
+    right_index = min(len(x), max_index + 11)
+    quadratic_1_x = x[left_index:right_index]
+    quadratic_1_y = y[left_index:right_index]
+    popt_1, pcov_1 = curve_fit(quadratic, quadratic_1_x, quadratic_1_y)
+    
+    # Find the x value closest to the apex of the first quadratic fit
+    apex_x = -popt_1[1] / (2 * popt_1[0])
+    apex_index = np.argmin(np.abs(x - apex_x))
+    
+    # Fit a quadratic using 10 points on either side of the apex of the first quadratic fit
+    left_index = max(0, apex_index - 10)
+    right_index = min(len(x), apex_index + 11)
+    quadratic_2_x = x[left_index:right_index]
+    quadratic_2_y = y[left_index:right_index]
+    popt_2, pcov_2 = curve_fit(quadratic, quadratic_2_x, quadratic_2_y)
+    
+    return popt_1, popt_2

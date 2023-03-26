@@ -5,7 +5,8 @@
 std::tuple<TCFMatrix, std::vector<double>, double>
 time_corr_function(Eigen::Ref<Eigen::RowVectorXd> energy_fluc, 
     Eigen::Ref<Eigen::RowVectorXd> time, 
-    int max_tau, int start_t0, int start_tau, int delta_tau){
+    int max_tau, int start_t0, int start_tau, int delta_tau, 
+    int calc_upto_tau){
     //
     std::vector<double> tau_values; // Vector of lag times
     std::vector<double> tcf_values; // Vector of the unnormalized TCF
@@ -37,7 +38,7 @@ time_corr_function(Eigen::Ref<Eigen::RowVectorXd> energy_fluc,
 
     // Calculation of the TCF at different lag times,
     // starting from start_tau 
-    for (int i_tau = start_tau; i_tau <= max_tau; i_tau+=delta_tau)
+    for (int i_tau = start_tau; i_tau <= calc_upto_tau; i_tau+=delta_tau)
     {
         current_tau = time(i_tau); // Current lag time 
         // Get the TCF for this lag time over the desired time origins
