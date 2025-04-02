@@ -23,8 +23,8 @@ inc = include_directories([['include', 'thirdparty']])
 
 deps = []
 
-cpp_dep = declare_dependency(include_directories : inc)
-deps += cpp_dep
+fastcpp_dep = declare_dependency(include_directories : inc)
+deps += fastcpp_dep
 
 # Python module
 py = import('python').find_installation('python', modules: ['numpy'])
