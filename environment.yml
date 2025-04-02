@@ -5,42 +5,34 @@
 name: trnsprtProp
 channels:
   - conda-forge
-# requirements:
-#   build:
-#     - {{ compiler('c') }}
-#     - {{ compiler('c++') }}
+  - bioconda
 dependencies:
-  - python==3.10
-  - ase
-  - numpy
-  - scipy
-  - fmt
-  - eigen
-  - pkg-config
+  - python>=3.10
+  - ase>=3.22.1
+  - numpy>=1.26.4
+  - scipy>=1.7.3
+  - ipython>=8.26.0
+  - pandas>=2.2.2
+  - ipykernel
+  - py-plumed>=2.4
+  - plumed
+  - gpaw
+  - pytest
+  - pipx
+  - snakemake
   - moltemplate
+  - packmol
+  - lammps
+  - setuptools>=61.0
   - matplotlib
-  - ipython
-  - pandas 
+  - numba 
+  - fmt # new for transportProp
+  - eigen
   - statsmodels
-  - ipykernel 
-  # - cmake
-    #- gcc
-    # - clang
-  # Packaging
-  - flit
-  - pytest==6.2.5
-  - coverage==6.1.1
-  - pytest-cov==3.0.0
-  - flake8==3.9.2
-  - mypy==0.910
-  - black==21.10b0
-  - isort==5.9.3
-  - autoflake==1.4
-  - flake8-docstrings==1.6.0
+  - meson>=1.2.3
+  - meson-python
   - typer
-  - meson
   - pybind11
-  - invoke 
-  - pip:
-    # works for regular pip packages
-    - lammps-logfile
+pip: 
+  - snakemake-executor-plugin-cluster-generic
+  - lammps-logfile
