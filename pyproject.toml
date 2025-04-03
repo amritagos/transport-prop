@@ -1,32 +1,66 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
 [project]
 name = "transportProp"
-authors = [{name = "Amrita Goswami", email = "amrita@hi.is"}]
-readme = "README.md"
-dynamic = ["version", "description"]
-
-[project.urls]
-Home = "https://english.hi.is/staff/amrita"
-
-[project.scripts]
-transportProp = "transportProp:app"
-
-[project.optional-dependencies]
-test = [
-    "pytest==6.2.5",
-    "coverage==6.1.1",
-    "pytest-cov==3.0.0",
+version = "0.0.1"
+description = "Calculates various transport properties and some correlation functions"
+authors = [
+    {name = "Amrita Goswami", email = "amrita16thaug646@gmail.com"},
 ]
-dev = [
-    "flake8==3.9.2",
-    "mypy==0.910",
-    "black==21.10b0",
-    "isort==5.9.3",
-    "autoflake==1.4",
-    "flake8-docstrings==1.6.0",
+
+dependencies = [
+    "numpy>=1.26.4",
+    "pybind11>=2.12.0",
+    "ase>=3.22.1",
+    "scipy>=1.7.3",
+    "pandas>=2.2.2",
+    "numba",
+    "typer",
+    "lammps-logfile",
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+# These are all that are seen by pip install .
+requires = ["pybind11", "meson-python", "numpy"]
+build-backend = "mesonpy"
+# Important, tells pip how to install the package
+[tool.meson-python.args]
+setup = [
+'-Dwrap_mode=forcefallback',
+# ^-- collects subprojects, see https://github.com/ERGO-Code/HiGHS/pull/1343#discussion_r1252446966
+]
+# Skip during installation to prevent local RPATH stripping issues
+# See: https://github.com/mesonbuild/meson-python/discussions/410
+install = ['--skip-subprojects']
+# Include so auditwheel on the CI can correctly generate wheels
+# See: https://github.com/ERGO-Code/HiGHS/pull/1343/files
+dist = ['--include-subprojects']
+
+[tool.cibuildwheel]
+build-frontend = "build"
+# TODO(rg): Needs an equivalent on windows, use an override
+before-build = "bash {project}/tools/wheels/cibw_setup.sh {project}"
+test-command = "pytest {project}/tests"
+test-requires = "pytest"
+build-verbosity = 1
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux2014"
+manylinux-i686-image = "manylinux2014"
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
+
+# /project will be the $PWD equivalent inside the docker used to build the wheel
+[tool.cibuildwheel.linux.environment]
+RUNNER_OS="Linux"
+[tool.cibuildwheel.macos.environment]
+RUNNER_OS="MacOS"
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64 arm64"]
+repair-wheel-command = [
+  "delocate-listdeps {wheel}",
+  "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} {wheel}",
 ]
 
 [tool.isort]

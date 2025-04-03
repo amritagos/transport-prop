@@ -26,13 +26,10 @@ conda activate trnsprtProp
 ```
 To deactivate the environment, just use `micromamba deactivate`. 
 
-Although this started out as a purely `Python` module (we started out using `flit`), we now use `pybind11`. Now we use `invoke` and `meson`. 
+We now use `meson` and `meson-python` to build the package. Install using the following: 
 
-In order to install the code, run the following:
-
-```bash
-inv build # flit build
-inv build --install
+```
+pip install .
 ```
 
 ## Tests
@@ -66,6 +63,8 @@ Options for subcommands can be run, for instance:
 ```bash
 transportProp msd --help
 ```
+
+See the unit tests for examples on how to use it in a Python script. 
 
 ## Validation 
 
