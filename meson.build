@@ -55,21 +55,21 @@ py.extension_module(
   dependencies: python_deps,
   cpp_args : cpp_args,
   install: true,
-  subdir: 'transportProp/'
+  subdir: 'transportProp' # path in site-packages
 )
 
 # pyflowy main package
 py.install_sources([
-    'transportProp/__init__.py',
-    'transportProp/cli.py',
-    'transportProp/io.py',
-    'transportProp/misc.py',
-    'transportProp/msd.py',
-    'transportProp/structures.py',
-    'transportProp/util.py',
-    'transportProp/vacf.py',
+    'python/transportProp/__init__.py',
+    'python/transportProp/cli.py',
+    'python/transportProp/io.py',
+    'python/transportProp/misc.py',
+    'python/transportProp/msd.py',
+    'python/transportProp/structures.py',
+    'python/transportProp/util.py',
+    'python/transportProp/vacf.py',
   ],
   pure: false, # install next to compiled extension
-  subdir: 'transportProp/'
+  subdir: 'transportProp' # path in site-packages
 )
 
