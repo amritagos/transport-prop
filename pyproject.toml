@@ -9,6 +9,7 @@ authors = [
 dependencies = [
     "numpy>=1.26.4",
     "pybind11>=2.12.0",
+    "lammps-logfile",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
