@@ -9,6 +9,11 @@ authors = [
 dependencies = [
     "numpy>=1.26.4",
     "pybind11>=2.12.0",
+    "ase>=3.22.1",
+    "scipy>=1.7.3",
+    "pandas>=2.2.2",
+    "numba",
+    "typer",
     "lammps-logfile",
 ]
 requires-python = ">=3.9"
