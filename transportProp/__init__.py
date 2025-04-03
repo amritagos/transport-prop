@@ -1,2 +1,3 @@
-import transportProp.fastcpp
-from transportProp.fastcpp import *
+from transportProp import fastcpp
+
+__all__ = [fastcpp]

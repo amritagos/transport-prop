@@ -1,5 +1,5 @@
 import pytest
-import transportProp as trp
+import transportProp as transportProp
 import numpy as np
 import ase
 from ase.atoms import Atom, Atoms # ASE stuff 
@@ -20,8 +20,8 @@ def short_three_mols():
     '''
     p = aux.getpath('input/vel.lammpstrj') 
     traj = ase.io.read(p, format='lammps-dump-text', index=':') # Read in every step of the trajectory
-    wat_traj = trp.misc.velocity_com_water_traj(traj)
-    vacf_three_mol =  trp.VelocityAutoCorrelation(wat_traj)
+    wat_traj = transportProp.misc.velocity_com_water_traj(traj)
+    vacf_three_mol =  transportProp.VelocityAutoCorrelation(wat_traj)
     return vacf_three_mol
 
 def test_vacf_all_atoms_t_t0(short_three_mols):

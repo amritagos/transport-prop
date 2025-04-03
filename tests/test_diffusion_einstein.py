@@ -1,5 +1,5 @@
 import pytest
-import transportProp as trp
+import transportProp as transportProp
 import numpy as np
 import ase
 from ase.atoms import Atom, Atoms # ASE stuff 
@@ -20,7 +20,7 @@ def short_single_particle():
     '''
     p = aux.getpath('input/single-particle-short.xyz') 
     wat_traj = ase.io.read(p, index=':') # Read in every step of the trajectory
-    msd_single_particle =  trp.MeanSquaredDisplacement(wat_traj)
+    msd_single_particle =  transportProp.MeanSquaredDisplacement(wat_traj)
     return msd_single_particle
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def short_three_particle():
     '''
     p = aux.getpath('input/three-particles-short.xyz') 
     wat_traj = ase.io.read(p, index=':') # Read in every step of the trajectory
-    msd_three_particles =  trp.MeanSquaredDisplacement(wat_traj)
+    msd_three_particles =  transportProp.MeanSquaredDisplacement(wat_traj)
     return msd_three_particles
 
 def test_msd_single_iatom_t_t0(short_single_particle):

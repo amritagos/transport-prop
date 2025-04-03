@@ -1,4 +1,4 @@
-import transportProp as trp
+import transportProp as transportProp
 import numpy as np
 import ase
 from ase.atoms import Atom, Atoms # ASE stuff 

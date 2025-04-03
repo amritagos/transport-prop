@@ -1,4 +1,4 @@
-project('transportProp', 'cpp', version:'0.1.1', default_options : ['warning_level=3', 'cpp_std=c++20', 'optimization=3'])
+project('trp', 'cpp', version:'0.1.1', default_options : ['warning_level=3', 'cpp_std=c++20', 'optimization=3'])
 
 compiler = meson.get_compiler('cpp')
 
@@ -46,7 +46,7 @@ python_deps = deps + [
 py.extension_module(
   'fastcpp',
   sources : [
-    'python_bindings/fastcpp.cpp',
+    'python_bindings/bindings.cpp',
     'src/generic.cpp',
     'src/rdf.cpp',
     'src/tcf.cpp'
