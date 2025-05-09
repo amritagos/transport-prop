@@ -1,5 +1,6 @@
 import pytest
 import transportProp as trp
+from transportProp.msd import sq_disp_iatom, msd_tau_t0
 import numpy as np
 from ase.io import read
 from ase.atoms import Atom, Atoms  # ASE stuff
@@ -57,9 +58,7 @@ def test_msd_single_iatom_t_t0(short_single_particle):
     pos_t0_iatom = pos_t0[0, :]
     # Get the positions of the atom with index 0 at time origin t
     pos_t_iatom = pos_t[0, :]
-    r2 = short_single_particle.sq_disp_iatom(
-        pos_t0_iatom, pos_t_iatom
-    )  # Squared distance
+    r2 = sq_disp_iatom(pos_t0_iatom, pos_t_iatom)  # Squared distance
     # Check:
     # should be 1482.2965976770176 A^2
     r2_ref = 1482.2965976770176
@@ -77,8 +76,10 @@ def test_msd_all_atoms_t_t0(short_three_particle):
     # and a lag time of 1 delta_t (difference between time frames)
     pos_t0 = wat_traj[0].get_positions()  # Positions of all atoms in the first frame
     pos_t = wat_traj[1].get_positions()  # Positions of all atoms in the second frame
-    msd_t0_t = short_three_particle.msd_tau_t0(
-        pos_t0, pos_t
+    dim = short_three_particle.dim
+    n_atoms = short_three_particle.n_atoms
+    msd_t0_t = msd_tau_t0(
+        pos_t0, pos_t, dim, n_atoms
     )  # MSD for one t0 and lag time, averaged over particles
     # Check:
     # should be 3109.92125715317 A^2

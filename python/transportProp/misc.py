@@ -5,6 +5,7 @@ from pathlib import Path
 from ase.build import molecule
 from ase import Atoms, Atom
 import numpy as np
+from numba import njit
 from scipy.optimize import curve_fit
 
 def getpath(*a):
@@ -14,19 +15,29 @@ def getpath(*a):
     d = Path(__file__).parent.resolve()
     return d.joinpath(*a)
 
+@njit
 def get_slice(a, dim):
-    ''' Returns a sliced array, given an array a. 
-    dim should be a string which is either 'x', 'y' or 'z'.
-    '''
-    if dim=='x':
-        return a[: , 0]
-    elif dim=='y':
-        return a[: , 1]
-    elif dim=='z':
-        return a[:, 2]
+    """
+    Returns an array of shape (n, 3) where, for dim='x', 'y', or 'z',
+    only the corresponding coordinate is retained and the others are set to zero.
+    For dim='xyz', returns the original array.
+    """
+    n = a.shape[0]
+    if dim == 'x':
+        ret = np.zeros((n, 3))
+        ret[:, 0] = a[:, 0]
+        return ret
+    elif dim == 'y':
+        ret = np.zeros((n, 3))
+        ret[:, 1] = a[:, 1]
+        return ret
+    elif dim == 'z':
+        ret = np.zeros((n, 3))
+        ret[:, 2] = a[:, 2]
+        return ret
     else:
-        # for the option dim='xyz'
-        return a 
+        # For dim 'xyz', return the original array unchanged.
+        return a
 
 def com_water_traj(atoms_traj):
     ''' Given a list of ASE Atoms objects, (read in from a trajectory)
